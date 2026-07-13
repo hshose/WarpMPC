@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="mit_humanoid">
+  <compiler angle="radian" meshdir="assets" autolimits="true" />
+  <default>
+    <default class="mit_humanoid">
+      <default class="visual">
+        <geom group="2" type="mesh" density="0" material="aluminium" contype="0" conaffinity="0" />
+      </default>
+      <default class="collision">
+        <geom group="3" rgba=".2 .6 .2 .3" contype="0" conaffinity="1" />
+      </default>
+    </default>
+  </default>
+  <asset>
+    <material name="aluminium" rgba="0.4 0.4 0.4 1" metallic="0.6" roughness="0.5" />
+    <material name="matte_black" rgba="0.05 0.05 0.05 1" metallic="0.3" roughness="1.0" />
+    <mesh name="left_foot_scaled" file="left_foot_scaled.stl" />
+    <mesh name="left_forearm_scaled" file="left_forearm_scaled.stl" />
+    <mesh name="left_hip_abad_scaled" file="left_hip_abad_scaled.stl" />
+    <mesh name="left_hip_yaw_scaled" file="left_hip_yaw_scaled.stl" />
+    <mesh name="left_leg_lower_scaled" file="left_leg_lower_scaled.stl" />
+    <mesh name="left_leg_upper_scaled" file="left_leg_upper_scaled.stl" />
+    <mesh name="left_shoulder1_scaled" file="left_shoulder1_scaled.stl" />
+    <mesh name="left_shoulder2_scaled" file="left_shoulder2_scaled.stl" />
+    <mesh name="left_shoulder3_scaled" file="left_shoulder3_scaled.stl" />
+    <mesh name="right_foot_scaled" file="right_foot_scaled.stl" />
+    <mesh name="right_hip_abad_scaled" file="right_hip_abad_scaled.stl" />
+    <mesh name="right_hip_yaw_scaled" file="right_hip_yaw_scaled.stl" />
+    <mesh name="right_leg_lower_scaled" file="right_leg_lower_scaled.stl" />
+    <mesh name="right_leg_upper_scaled" file="right_leg_upper_scaled.stl" />
+    <mesh name="right_shoulder1_scaled" file="right_shoulder1_scaled.stl" />
+    <mesh name="right_shoulder2_scaled" file="right_shoulder2_scaled.stl" />
+    <mesh name="right_shoulder3_scaled" file="right_shoulder3_scaled.stl" />
+    <mesh name="torso_scaled" file="torso_scaled.stl" />
+  </asset>
+  <worldbody>
+    <body name="base" pos="0 0 0.61" childclass="mit_humanoid">
+      <inertial pos="0.009896 0.004771 0.100522" mass="8.52" fullinertia="0.172699 0.105949 0.091906 0.001419 0.004023 -0.001672" />
+      <freejoint name="floating_base_joint" />
+      <geom name="base_visual" class="visual" mesh="torso_scaled" pos="-0.00565 0 -0.05735" quat="1 0 0 0" />
+      <geom name="base_collision" class="collision" pos="0.023 0.0 0.08" quat="1 0 0 0" type="box" size="0.075 0.15 0.175" />
+      <body name="right_hip_yaw" pos="-0.00565 -0.082 -0.05735" quat="0.996194694832 0 -0.0871557800056 0">
+        <inertial pos="-0.064842 3.6e-05 -0.063090" mass="0.84563" fullinertia="0.0015373 0.0014252 0.0012028 -1.1e-06 0.0005578 -2.4e-06" />
+        <joint name="right_hip_yaw_joint" axis="0 0 1" range="-6.28 6.28" />
+        <geom name="right_hip_yaw_visual" class="visual" mesh="right_hip_yaw_scaled" pos="0 0 0" quat="1 0 0 0" />
+        <body name="right_hip_abad" pos="-0.06435 0 -.07499" quat="0.976296040993 0 0.216439461148 0">
+          <inertial pos="0.067232 0.013018 0.0001831" mass="1.20868" fullinertia="0.0017535 0.003338 0.0019927 6.3e-06 -0.000080 1.3e-05" />
+          <joint name="right_hip_abad_joint" axis="1 0 0" range="-6.28 6.28" />
+          <geom name="right_hip_abad_visual" class="visual" mesh="right_hip_abad_scaled" material="matte_black" pos="0 0 0" quat="1 0 0 0" />
+          <body name="right_upper_leg" pos="0.07133 0.002 0.0" quat="0.991444886683 0 -0.130525999979 0">
+            <inertial pos="0.0132054 -0.0269864 -0.096021" mass="2.64093" fullinertia="0.0243761 0.0259015 0.0038929 -9.96e-05 0.0006548 -0.0026713" />
+            <joint name="right_hip_pitch_joint" axis="0 1 0" range="-6.28 6.28" />
+            <geom name="right_upper_leg_visual" class="visual" mesh="right_leg_upper_scaled" pos="0.01283 0 -0.0174" quat="1 0 0 0" />
+            <body name="right_lower_leg" pos="0.0 0.0 -0.2666" quat="1 0 0 0">
+              <inertial pos="0.00528 -0.0014762 -0.13201" mass="0.35435" fullinertia="0.003051 0.003033 0.0002529 0.0 0.0000873 -3.93e-05" />
+              <joint name="right_knee_joint" axis="0 1 0" range="0. 3." />
+              <geom name="right_lower_leg_visual" class="visual" mesh="right_leg_lower_scaled" pos="0 0 0" quat="1 0 0 0" />
+              <body name="right_foot" pos="0.0 0.0 -0.2785" quat="1 0 0 0">
+                <inertial pos="0.022623 0.0 -0.012826" mass="0.280951" fullinertia="0.0000842 0.0007959 0.0007681 0.0 -0.0000488 0.0" />
+                <joint name="right_ankle_joint" axis="0 1 0" range="-1.5 1.5" />
+                <geom name="right_foot_visual" class="visual" mesh="right_foot_scaled" pos="0 0 0" quat="1 0 0 0" />
+                <geom name="right_heel_collision" class="collision" pos="-0.05 0.0 -0.031" type="sphere" size="0.01" />
+                <geom name="right_toe_collision" class="collision" pos="0.1 0.0 -0.031" type="sphere" size="0.01" />
+                <body name="right_toe" pos="0.1 0 -.041" quat="1 0 0 0" />
+                <body name="right_heel" pos="-0.05 0 -.041" quat="1 0 0 0" />
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="left_hip_yaw" pos="-0.00565 0.082 -0.05735" quat="0.996194694832 0 -0.0871557800056 0">
+        <inertial pos="-0.064842 -3.6e-05 -0.063090" mass="0.84563" fullinertia="0.0015373 0.0014252 0.0012028 1.1e-06 0.0005578 2.4e-06" />
+        <joint name="left_hip_yaw_joint" axis="0 0 -1" range="-6.28 6.28" />
+        <geom name="left_hip_yaw_visual" class="visual" mesh="left_hip_yaw_scaled" pos="0 0 0" quat="1 0 0 0" />
+        <body name="left_hip_abad" pos="-0.06435 0 -.07499" quat="0.976296040993 0 0.216439461148 0">
+          <inertial pos="0.067232 -0.013018 0.0001831" mass="1.20868" fullinertia="0.0017535 0.003338 0.0019927 -6.3e-06 -0.000080 -1.3e-05" />
+          <joint name="left_hip_abad_joint" axis="1 0 0" range="-6.28 6.28" />
+          <geom name="left_hip_abad_visual" class="visual" mesh="left_hip_abad_scaled" material="matte_black" pos="0 0 0" quat="1 0 0 0" />
+          <body name="left_upper_leg" pos="0.07133 -0.002 0.0" quat="0.991444886683 0 -0.130525999979 0">
+            <inertial pos="0.0132054 0.0269864 -0.096021" mass="2.64093" fullinertia="0.0243761 0.0259015 0.0038929 9.96e-05 0.0006548 0.0026713" />
+            <joint name="left_hip_pitch_joint" axis="0 1 0" range="-6.28 6.28" />
+            <geom name="left_upper_leg_visual" class="visual" mesh="left_leg_upper_scaled" pos="0.01283 0 -0.0174" quat="1 0 0 0" />
+            <body name="left_lower_leg" pos="0.0 0.0 -0.2666" quat="1 0 0 0">
+              <inertial pos="0.00528 0.0014762 -0.13201" mass="0.35435" fullinertia="0.003051 0.003033 0.0002529 0.0 0.0000873 3.93e-05" />
+              <joint name="left_knee_joint" axis="0 1 0" range="0. 3." />
+              <geom name="left_lower_leg_visual" class="visual" mesh="left_leg_lower_scaled" pos="0 0 0" quat="1 0 0 0" />
+              <body name="left_foot" pos="0.0 0.0 -0.2785" quat="1 0 0 0">
+                <inertial pos="0.022623 0.0 -0.012826" mass="0.280951" fullinertia="0.0000842 0.0007959 0.0007681 0.0 -0.0000488 0.0" />
+                <joint name="left_ankle_joint" axis="0 1 0" range="-1.5 1.5" />
+                <geom name="left_foot_visual" class="visual" mesh="left_foot_scaled" pos="0 0 0" quat="1 0 0 0" />
+                <geom name="left_heel_collision" class="collision" pos="-0.05 0.0 -0.031" type="sphere" size="0.01" />
+                <geom name="left_toe_collision" class="collision" pos="0.1 0.0 -0.031" type="sphere" size="0.01" />
+                <body name="left_toe" pos="0.1 0 -.041" quat="1 0 0 0" />
+                <body name="left_heel" pos="-0.05 0 -.041" quat="1 0 0 0" />
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="right_shoulder" pos="0.01346 -0.17608 0.24657" quat="1 0 0 0">
+        <inertial pos="0.009265 -0.052623 -0.0001249" mass="0.788506" fullinertia="0.0013678 0.0007392 0.000884 -2.66e-05 0.0000021 1.2e-06" />
+        <joint name="right_arm_pitch" axis="0 1 0" range="-6.28 6.28" />
+        <geom name="right_shoulder_visual" class="visual" mesh="right_shoulder1_scaled" material="matte_black" pos="0 0 0" quat="1 0 0 0" />
+        <body name="right_shoulder_2" pos="0 -.05760 0" quat="1 0 0 0">
+          <inertial pos="0.0006041 -0.0001221 -0.082361" mass="0.80125" fullinertia="0.0011524 0.0011921 0.0012386 -7e-07 0.0000396 -1.4e-06" />
+          <joint name="right_shoulder_abad" axis="1 0 0" range="-6.28 6.28" />
+          <geom name="right_shoulder_2_visual" class="visual" mesh="right_shoulder2_scaled" material="matte_black" pos="0 0 0" quat="1 0 0 0" />
+          <body name="right_upper_arm" pos="0 0 -.10250" quat="1 0 0 0">
+            <inertial pos="0.0001703 0.016797 -0.060" mass="0.905588" fullinertia="0.0012713 0.0017477 0.0008191 -1e-06 -0.000008 2.25e-05" />
+            <joint name="right_shoulder_yaw" axis="0 0 1" range="-6.28 6.28" />
+            <geom name="right_upper_arm_visual" class="visual" mesh="right_shoulder3_scaled" pos="0 0 0" quat="1 0 0 0" />
+            <body name="right_lower_arm" pos="0 0 -.15750" quat="1 0 0 0">
+              <inertial pos="-0.0059578 -0.000111 -0.0426735" mass="0.34839" fullinertia="0.001570 0.0016167 0.0000619 -2e-07 0.0000335 -3e-06" />
+              <joint name="right_elbow" axis="0 1 0" range="-6.28 6.28" />
+              <geom name="right_lower_arm_visual" class="visual" mesh="left_forearm_scaled" pos="0 0 0" quat="1 0 0 0" />
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="left_shoulder" pos="0.01346 0.17608 0.24657" quat="1 0 0 0">
+        <inertial pos="0.009265 0.052623 -0.0001249" mass="0.788506" fullinertia="0.0013678 0.0007392 0.000884 2.66e-05 0.0000021 -1.2e-06" />
+        <joint name="left_arm_pitch" axis="0 1 0" range="-6.28 6.28" />
+        <geom name="left_shoulder_visual" class="visual" mesh="left_shoulder1_scaled" material="matte_black" pos="0 0 0" quat="1 0 0 0" />
+        <body name="left_shoulder_2" pos="0 .05760 0" quat="1 0 0 0">
+          <inertial pos="0.0006041 0.0001221 -0.082361" mass="0.80125" fullinertia="0.0011524 0.0011921 0.0012386 7e-07 0.0000396 1.4e-06" />
+          <joint name="left_shoulder_abad" axis="1 0 0" range="-6.28 6.28" />
+          <geom name="left_shoulder_2_visual" class="visual" mesh="left_shoulder2_scaled" material="matte_black" pos="0 0 0" quat="1 0 0 0" />
+          <body name="left_upper_arm" pos="0 0 -.10250" quat="1 0 0 0">
+            <inertial pos="0.0001703 -0.016797 -0.060" mass="0.905588" fullinertia="0.0012713 0.0017477 0.0008191 1e-06 -0.000008 -2.25e-05" />
+            <joint name="left_shoulder_yaw" axis="0 0 -1" range="-6.28 6.28" />
+            <geom name="left_upper_arm_visual" class="visual" mesh="left_shoulder3_scaled" pos="0 0 0" quat="1 0 0 0" />
+            <body name="left_lower_arm" pos="0 0 -.15750" quat="1 0 0 0">
+              <inertial pos="-0.0059578 0.000111 -0.0426735" mass="0.34839" fullinertia="0.001570 0.0016167 0.0000619 2e-07 0.0000335 3e-06" />
+              <joint name="left_elbow" axis="0 1 0" range="-6.28 6.28" />
+              <geom name="left_lower_arm_visual" class="visual" mesh="left_forearm_scaled" pos="0 0 0" quat="1 0 0 0" />
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

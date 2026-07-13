@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "WarpMPC"
+version = "0.1.0"
+description = "Fixed-pattern batched GPU kernels and sparse MPC tools in JAX."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "casadi>=3.7",
+    "flax",
+    "jax",
+    "matplotlib",
+    "numpy",
+    "optax",
+    "qdldl",
+    "scipy",
+    "warp-lang",
+]
+
+[project.optional-dependencies]
+benchmarks = [
+    "cmake",
+    "jaxadi",
+    "jaxopt",
+    "osqp",
+    "pyyaml",
+    "torch",
+]
+test = [
+    "pytest",
+    "osqp",
+]
+
+[tool.setuptools.packages.find]
+include = [
+    "warpmpc*",
+]

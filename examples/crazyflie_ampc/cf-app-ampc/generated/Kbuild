@@ -1,0 +1,2 @@
+obj-y += ampc_policy_data.o
+obj-y += ampc_policy_forward.o

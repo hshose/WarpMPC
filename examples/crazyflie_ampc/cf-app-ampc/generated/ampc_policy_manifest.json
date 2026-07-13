@@ -1,0 +1,64 @@
+{
+  "architecture": {
+    "layers": [
+      {
+        "activation": "leaky_relu",
+        "input_dim": 12,
+        "negative_slope": 0.01,
+        "output_dim": 32
+      },
+      {
+        "activation": "leaky_relu",
+        "input_dim": 32,
+        "negative_slope": 0.01,
+        "output_dim": 32
+      },
+      {
+        "activation": "leaky_relu",
+        "input_dim": 32,
+        "negative_slope": 0.01,
+        "output_dim": 32
+      },
+      {
+        "activation": "linear",
+        "input_dim": 32,
+        "negative_slope": 0.0,
+        "output_dim": 4
+      }
+    ],
+    "type": "mlp"
+  },
+  "backend": "simple",
+  "files": {
+    "data_header": "ampc_policy_data.h",
+    "data_source": "ampc_policy_data.c",
+    "forward_header": "ampc_policy_forward.h",
+    "forward_source": "ampc_policy_forward.c",
+    "test_header": "ampc_policy_test_data.h",
+    "test_npz": "ampc_policy_test_cases.npz",
+    "test_source": "ampc_policy_test_data.c"
+  },
+  "input_dim": 12,
+  "metadata_iteration": 0,
+  "model_config": {
+    "activation": "leaky_relu",
+    "hidden_sizes": [
+      32,
+      32,
+      32
+    ],
+    "negative_slope": 0.01,
+    "output_dim": 4,
+    "prediction_target": "first_action"
+  },
+  "name": "crazyflie_ampc_policy",
+  "output_dim": 4,
+  "precision": "float32",
+  "prediction_target": "first_action",
+  "prefix": "ampc_policy",
+  "schema_version": 1,
+  "test_cases": {
+    "count": 64,
+    "tolerance": 0.0001
+  }
+}

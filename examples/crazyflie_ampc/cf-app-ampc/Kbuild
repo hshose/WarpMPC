@@ -1,0 +1,4 @@
+obj-y += src/
+obj-y += generated/
+
+ccflags-y += -I$(OOT)/generated

@@ -1,0 +1,77 @@
+cost_q: [
+  0, 0, 8000, 300, 600, 300,
+  20, 20, 0.05, 0.05, 0.05,
+  20, 20, 0.05, 0.05, 0.05,
+  100, 100, 100, 100,
+  100, 100, 100, 100
+]
+
+cost_dq: [
+  100, 100, 100, 800, 800, 100,
+  5, 5, 0.12, 0.12, 0.12,
+  5, 5, 0.12, 0.12, 0.12,
+  0.4, 0.4, 0.4, 0.3,
+  0.4, 0.4, 0.4, 0.3
+]
+
+cost_ddq: [
+  0.001, 0.001, 0.001, 0.001, 0.001,
+  0.001, 0.001, 0.001, 0.001, 0.001,
+  0.002, 0.002, 0.002, 0.002,
+  0.002, 0.002, 0.002, 0.002
+]
+
+cost_F: [
+  0.005, 0.005, 0.005,
+  0.005, 0.005, 0.005,
+  0.005, 0.005, 0.005,
+  0.005, 0.005, 0.005
+]
+
+cost_tau: [
+  0.5, 0.5, 0.01, 0.01, 0.01,
+  0.5, 0.5, 0.01, 0.01, 0.01,
+  0.5, 0.5, 0.5, 0.5,
+  0.5, 0.5, 0.5, 0.5
+]
+
+gains_leg_swing_p:  [50, 50, 50, 50, 50]
+gains_leg_swing_d:  [2, 2, 2, 2, 2]
+gains_leg_stance_p: [0, 0, 0, 0, 0]
+gains_leg_stance_d: [3, 3, 3, 1.5, 1.5]
+gains_arm_p:        [50, 50, 25, 25]
+gains_arm_d:        [1, 1, 1, 1]
+gains_stance_velocity_setpoint_to_zero: true
+
+qhome: [
+  0, 0, 0.61,
+  0, 0, 0,
+  0, 0, -0.724757, 1.412282, -0.68752,
+  0, 0, -0.724757, 1.412282, -0.68752,
+  0, -0.1, 0, 0,
+  0, 0.1, 0, 0
+]
+
+N: 28
+dt_start: 0.03
+dt_exponent: 1.0
+
+gait_cycle_duration: 0.7
+gait_overlap_duration: 0.01
+gait_right_swing_duration: 0.34
+gait_left_swing_duration: 0.34
+foot_lift_height: 0.05
+
+osqp_alpha: 1.4
+osqp_rho: 0.02
+osqp_max_iter: 25
+osqp_scaling: 2
+osqp_print_status: false
+
+line_search_g_max: 1e-1
+line_search_g_min: 1e-3
+line_search_gamma_c: 1e-3
+line_search_armijo_factor: 1e-4
+line_search_step_decay: 0.5
+line_search_step_min: 0.03
+line_search_constraint_scale: 0.05
