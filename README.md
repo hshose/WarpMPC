@@ -13,21 +13,21 @@ WarpMPC further provides convenience tools for synthesizing large datasets from 
 
 ## Paper
 
-A detailed description of the solver is available in the paper: [WarpMPC: Large-Batch MPC on GPU via ADMM with Unrolled LDLᵀ Factorization](https://arxiv.org/abs/1234.12345)
+A detailed description of the solver is available in the paper: [WarpMPC: Large-Batch MPC on GPU via ADMM with Unrolled LDLᵀ Factorization](https://arxiv.org/abs/2607.11603)
 
 If you find WarpMPC useful, consider citing it:
 ```bibtex
 @article{hose2026warpmpc,
-  title={WarpMPC: Large-Batch MPC on GPU via ADMM with Unrolled LDLᵀ Factorization},
+  title={{WarpMPC}: Large-Batch {MPC} on {GPU} via {ADMM} with Unrolled {$LDL^\top$} Factorization},
   author={Hose, Henrik and Jeon, Se Hwan and Khazoom, Charles and Kim, Sangbae and Trimpe, Sebstian},
-  journal={arXiv preprint arxiv:....}
+  journal={arXiv preprint arxiv:2607.11603},
   year={2026}
 }
 ```
 
 ## Video
 
-[![YouTube](.assets/thumbnail_play.png)](https://youtu.be/pzOyjRFfjQI)
+[![YouTube](.assets/thumbnail_play.png)](https://youtu.be/PW0e2TkDLyM)
 
 ## Modules
 
