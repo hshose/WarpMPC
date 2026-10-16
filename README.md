@@ -128,6 +128,9 @@ when the desired Python environment is already active.
 For the direct humanoid Python command, either activate the environment first or call its Python binary as shown.
 Note on the benchmarks: The PCG baseline is not yet merged into this codebase.
 
+The benchmark suite also includes MPPI and CEM sampling baselines; see the
+[benchmark guide](benchmarks/README.md) for configuration and dry-run commands.
+
 ## Tests
 
 ```bash

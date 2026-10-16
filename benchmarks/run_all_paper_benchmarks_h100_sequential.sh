@@ -142,6 +142,10 @@ run_job "nonlinear_mpc" "cartpole_quadratic_mpc_turbompc" "${ROOT}/benchmarks/no
 run_job "nonlinear_mpc" "cartpole_quadratic_mpc_turbompc_autodiff" "${ROOT}/benchmarks/nonlinear_mpc/run_turbompc_autodiff_cartpole_quadratic_mpc.sh" \
   "CARTPOLE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
   "TURBOMPC_AUTODIFF_CARTPOLE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
+run_job "nonlinear_mpc" "cartpole_quadratic_mpc_mppi" "${ROOT}/benchmarks/nonlinear_mpc/run_mppi_cartpole_quadratic_mpc.sh" \
+  "CARTPOLE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" "SAMPLING_REQUIRE_H100=1"
+run_job "nonlinear_mpc" "cartpole_quadratic_mpc_cem" "${ROOT}/benchmarks/nonlinear_mpc/run_cem_cartpole_quadratic_mpc.sh" \
+  "CARTPOLE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" "SAMPLING_REQUIRE_H100=1"
 run_job "nonlinear_mpc" "crazyflie_sqp_rollout" "${ROOT}/benchmarks/nonlinear_mpc/run_crazyflie_sqp_rollout.sh" \
   "CRAZYFLIE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
   "NONLINEAR_QDLDL_VARIANTS=${PAPER_NONLINEAR_QDLDL_VARIANTS}" \
@@ -158,6 +162,10 @@ run_job "nonlinear_mpc" "crazyflie_sqp_rollout_turbompc" "${ROOT}/benchmarks/non
 run_job "nonlinear_mpc" "crazyflie_sqp_rollout_turbompc_autodiff" "${ROOT}/benchmarks/nonlinear_mpc/run_turbompc_autodiff_crazyflie_sqp_rollout.sh" \
   "CRAZYFLIE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
   "TURBOMPC_AUTODIFF_CRAZYFLIE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
+run_job "nonlinear_mpc" "crazyflie_sqp_rollout_mppi" "${ROOT}/benchmarks/nonlinear_mpc/run_mppi_crazyflie_sqp_rollout.sh" \
+  "CRAZYFLIE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" "SAMPLING_REQUIRE_H100=1"
+run_job "nonlinear_mpc" "crazyflie_sqp_rollout_cem" "${ROOT}/benchmarks/nonlinear_mpc/run_cem_crazyflie_sqp_rollout.sh" \
+  "CRAZYFLIE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" "SAMPLING_REQUIRE_H100=1"
 run_job "nonlinear_mpc" "humanoid_mpc" "${ROOT}/benchmarks/nonlinear_mpc/run_humanoid_mpc.sh" \
   "HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
   "NONLINEAR_QDLDL_VARIANTS=${PAPER_NONLINEAR_QDLDL_VARIANTS}" \

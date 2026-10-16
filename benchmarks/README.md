@@ -68,6 +68,12 @@ The nonlinear MPAX launcher uses main's 500-iteration configuration and `1e-4`
 tolerances; explicit `MPAX_*` environment variables can override them. The other
 nonlinear QP backends retain the publication branch's `1e-5` tolerances.
 
+The nonlinear suite includes MPPI and CEM sampling baselines for cartpole and
+quadrotor, alongside the SQP baselines. Humanoid TurboMPC defaults to two Ruiz
+scaling passes (`TURBOMPC_HUMANOID_SCALING=2`). The sampling jobs in the full
+paper runners require an H100; individual sampling scripts can run on other
+CUDA GPUs when `SAMPLING_REQUIRE_H100=0`.
+
 Preview either complete sweep without submitting jobs or running benchmarks:
 
 ```bash
@@ -77,3 +83,8 @@ bash benchmarks/run_all_paper_benchmarks_h100_sequential.sh --dry-run
 
 Both runners launch numerical result jobs independently of tests and dependency
 checks. Run those checks separately when setting up the environment.
+
+Cartpole sampling uses the publication grid (`dt=0.1`, 100 prediction stages,
+20 closed-loop steps), matching the two-second SQP benchmark. Sampling settings
+were carried over from main; quality and H100 throughput need remeasurement on
+this grid.
