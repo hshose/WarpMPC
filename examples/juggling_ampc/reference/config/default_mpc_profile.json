@@ -1,0 +1,12 @@
+{
+  "name": "full_horizon_both_rho001",
+  "spec": "config/cpp_ball_spec.json",
+  "sqp_iterations": 2,
+  "osqp_iterations": 40,
+  "rho": 0.001,
+  "dynamic_intervals": 20,
+  "endpoint_acceleration_tail": false,
+  "neglect_ball_reaction": true,
+  "constant_midpoint_preconditioner": true,
+  "residual_lifting": false
+}

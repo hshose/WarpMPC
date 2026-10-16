@@ -18,6 +18,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 EVALUATOR = ROOT / "benchmarks" / "nonlinear_mpc" / "evaluate_cartpole_quadratic_mpc.py"
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import record_vram_case
+
 def _parse_ints(text: str) -> list[int]:
     return [int(part.strip()) for part in text.split(",") if part.strip()]
 
@@ -137,6 +141,11 @@ def _write_csv(path: pathlib.Path, rows: list[dict[str, object]]) -> None:
         "mpax_pock_chambolle_alpha",
         "mpax_regularization",
         "mpax_unroll",
+        "mpax_warm_start",
+        "mpax_warm_start_primal",
+        "mpax_warm_start_primal_scale",
+        "mpax_primal_importance",
+        "mpax_scale_invariant_initial_primal_weight",
         "total_closed_loop_steps",
         "total_sqp_iterations",
         "elapsed_s",
@@ -236,6 +245,7 @@ def _plot_summary(path: pathlib.Path, rows: list[dict[str, object]]) -> None:
     plt.close(fig)
 
 
+@record_vram_case
 def run_batch(
     args: argparse.Namespace,
     *,
@@ -311,6 +321,8 @@ def run_batch(
         str(args.mpax_pock_chambolle_alpha),
         "--mpax-regularization",
         str(args.mpax_regularization),
+        "--mpax-primal-importance", str(args.mpax_primal_importance),
+        "--mpax-warm-start-primal-scale", str(args.mpax_warm_start_primal_scale),
         "--rho",
         str(args.rho),
         "--sigma",
@@ -352,6 +364,9 @@ def run_batch(
         ])
     if args.mpax_unroll:
         cmd.append("--mpax-unroll")
+    cmd.append("--mpax-warm-start" if args.mpax_warm_start else "--no-mpax-warm-start")
+    cmd.append("--mpax-warm-start-primal" if args.mpax_warm_start_primal else "--no-mpax-warm-start-primal")
+    cmd.append("--mpax-scale-invariant-initial-primal-weight" if args.mpax_scale_invariant_initial_primal_weight else "--no-mpax-scale-invariant-initial-primal-weight")
     if not transpose_work:
         cmd.append("--no-transpose-work")
     if not segmented:
@@ -444,14 +459,19 @@ def main() -> None:
     parser.add_argument("--integrator-substeps", type=int, default=1)
     parser.add_argument("--sqp-iterations", type=int, default=5)
     parser.add_argument("--osqp-max-iter", "--max-iter", dest="osqp_max_iter", type=int, default=25)
-    parser.add_argument("--mpax-iteration-limit", type=int, default=None)
-    parser.add_argument("--mpax-eps-abs", type=float, default=1e-3)
-    parser.add_argument("--mpax-eps-rel", type=float, default=1e-3)
+    parser.add_argument("--mpax-iteration-limit", type=int, default=500)
+    parser.add_argument("--mpax-eps-abs", type=float, default=1e-4)
+    parser.add_argument("--mpax-eps-rel", type=float, default=1e-4)
     parser.add_argument("--mpax-termination-evaluation-frequency", type=int, default=100)
     parser.add_argument("--mpax-l-inf-ruiz-iterations", type=int, default=10)
     parser.add_argument("--mpax-pock-chambolle-alpha", type=float, default=1.0)
     parser.add_argument("--mpax-regularization", type=float, default=0.0)
     parser.add_argument("--mpax-unroll", action="store_true")
+    parser.add_argument("--mpax-warm-start", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal-scale", type=float, default=1.0)
+    parser.add_argument("--mpax-primal-importance", type=float, default=0.1)
+    parser.add_argument("--mpax-scale-invariant-initial-primal-weight", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--rho", type=float, default=0.1)
     parser.add_argument("--sigma", type=float, default=1e-6)
     parser.add_argument("--alpha", type=float, default=1.6)
@@ -484,7 +504,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     if args.mpax_iteration_limit is None:
-        args.mpax_iteration_limit = args.osqp_max_iter
+        args.mpax_iteration_limit = 500
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     rows = []

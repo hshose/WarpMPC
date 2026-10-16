@@ -167,13 +167,17 @@ def _rho_vectors(
     l: np.ndarray | None,
     u: np.ndarray | None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    if settings.rho_free is not None and (
+        not np.isfinite(settings.rho_free) or settings.rho_free <= 0
+    ):
+        raise ValueError("rho_free must be finite and positive, or None")
     if settings.rho_is_vec:
         if l is None or u is None:
             raise ValueError("l and u are required when settings.rho_is_vec=True")
         constr_type = _bounds_type(np.asarray(l)[:m], np.asarray(u)[:m])
         rho_vec = np.where(
             constr_type < 0,
-            1e-6,
+            settings.rho if settings.rho_free is None else settings.rho_free,
             np.where(constr_type > 0, 1e3 * settings.rho, settings.rho),
         )
     else:

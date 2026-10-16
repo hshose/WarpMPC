@@ -32,6 +32,10 @@ from jaxopt.linear_solve import solve_cg
 from benchmarks.problems import make_mpc_kkt, sample_kkt_values, structural_density
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class CgResult:
     dtype: str
@@ -361,44 +365,45 @@ def main() -> None:
 
         print("batch, estimated_arrays, solve_s, systems/s")
         for batch in batches:
-            estimate = _estimate_bytes(batch, kkt.shape[0], kkt.nnz, dtype)
-            if estimate > max_bytes:
-                print(f"{batch}, {_format_gb(estimate)}, skipped_over_limit, -")
-                break
+            with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype)):
+                estimate = _estimate_bytes(batch, kkt.shape[0], kkt.nnz, dtype)
+                if estimate > max_bytes:
+                    print(f"{batch}, {_format_gb(estimate)}, skipped_over_limit, -")
+                    break
 
-            values = sample_kkt_values(
-                kkt,
-                batch_size=batch,
-                seed=args.seed + batch,
-                variation=args.variation,
-                dtype=dtype,
-            )
-            rhs = np.random.default_rng(args.seed + 1000 + batch).standard_normal(
-                (batch, kkt.shape[0])
-            ).astype(dtype)
-            values_jax = jnp.asarray(values)
-            rhs_jax = jnp.asarray(rhs)
+                values = sample_kkt_values(
+                    kkt,
+                    batch_size=batch,
+                    seed=args.seed + batch,
+                    variation=args.variation,
+                    dtype=dtype,
+                )
+                rhs = np.random.default_rng(args.seed + 1000 + batch).standard_normal(
+                    (batch, kkt.shape[0])
+                ).astype(dtype)
+                values_jax = jnp.asarray(values)
+                rhs_jax = jnp.asarray(rhs)
 
-            try:
-                solve_exe, _ = _compile_and_warm(solver, values_jax, rhs_jax)
-                solve_s, _ = _time_compiled(solve_exe, values_jax, rhs_jax, repeat=args.repeat)
-            except Exception as exc:
-                print(f"{batch}, {_format_gb(estimate)}, failed, {type(exc).__name__}: {exc}")
-                break
+                try:
+                    solve_exe, _ = _compile_and_warm(solver, values_jax, rhs_jax)
+                    solve_s, _ = _time_compiled(solve_exe, values_jax, rhs_jax, repeat=args.repeat)
+                except Exception as exc:
+                    print(f"{batch}, {_format_gb(estimate)}, failed, {type(exc).__name__}: {exc}")
+                    break
 
-            row = CgResult(
-                dtype=dtype.name,
-                batch_size=batch,
-                estimated_bytes=estimate,
-                solve_s=solve_s,
-                cg_maxiter=args.cg_maxiter,
-                cg_tol=args.cg_tol,
-                ridge=args.ridge,
-                max_abs_x_vs_qdldl=max_abs_x,
-                max_rel_residual=max_rel_residual,
-            )
-            results.append(row)
-            print(f"{batch}, {_format_gb(estimate)}, {solve_s:.6f}, {row.systems_per_s:.2f}")
+                row = CgResult(
+                    dtype=dtype.name,
+                    batch_size=batch,
+                    estimated_bytes=estimate,
+                    solve_s=solve_s,
+                    cg_maxiter=args.cg_maxiter,
+                    cg_tol=args.cg_tol,
+                    ridge=args.ridge,
+                    max_abs_x_vs_qdldl=max_abs_x,
+                    max_rel_residual=max_rel_residual,
+                )
+                results.append(row)
+                print(f"{batch}, {_format_gb(estimate)}, {solve_s:.6f}, {row.systems_per_s:.2f}")
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

@@ -32,14 +32,18 @@ from benchmarks.nonlinear_mpc.evaluate_humanoid_mpc import (
 )
 from benchmarks.nonlinear_mpc.turbompc_adapter import (
     DenseStageTurbompcProblem,
+    DenseStageQPScaling,
+    ScaledTurbompcADMM,
     initial_admm_state_batch,
     make_problem_params,
     make_solver,
     make_solver_params,
+    qp_residuals,
 )
+from warpmpc.jax_osqp import OSQPSettings
+from warpmpc.jax_sqp import build_sparse_mpc_plan
 from benchmarks.problems.humanoid_mpc import (
     BodyReferenceCommand,
-    HUMANOID_MPC_STANDING_REFERENCE_S,
     HUMANOID_NDQ,
     HUMANOID_NQ,
     HUMANOID_NTAU,
@@ -72,6 +76,10 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         args.rho = loaded_params.osqp_rho
     if args.alpha is None:
         args.alpha = loaded_params.osqp_alpha
+    if args.scaling is None:
+        args.scaling = loaded_params.osqp_scaling
+    if args.scaling < 0:
+        raise ValueError("scaling must be nonnegative")
     if args.line_search_step_min is None:
         args.line_search_step_min = loaded_params.line_search_step_min
     params_obj = replace(loaded_params, n_nodes=args.horizon_nodes)
@@ -163,6 +171,19 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         forward_backend=args.turbompc_forward_backend,
         backward_backend=args.turbompc_backward_backend,
     )
+    if args.scaling:
+        # Match WarpMPC's fixed scaling, including its representative gradient
+        # in increment coordinates. This does not change the MPC objective or
+        # constraints; only the coordinates used by the inner ADMM solve.
+        plan = build_sparse_mpc_plan(
+            sparse_problem,
+            osqp_settings=OSQPSettings(scaling=args.scaling),
+            representative_z=z0,
+            representative_params=params0,
+        )
+        solver._admm_solver_fwd = ScaledTurbompcADMM(
+            solver._admm_solver_fwd, DenseStageQPScaling.from_sparse_plan(problem, plan)
+        )
     setup_s = time.perf_counter() - setup_start
     print(f"setup={setup_s:.3f}s", flush=True)
 
@@ -178,18 +199,22 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     jax.block_until_ready(admm_state.x_blocks)
 
     def solve_one(states_one, controls_one, params_one, admm_state_one):
-        return solver._solve_impl(
+        problem_params = make_problem_params(params_one)
+        qp_data = solver._build_qp_data(states_one, controls_one, problem_params)
+        solution = solver._solve_impl(
             states_one,
             controls_one,
-            make_problem_params(params_one),
+            problem_params,
             admm_state_one,
         )
+        primal, dual = qp_residuals(qp_data, solution.admm_state)
+        return solution, primal, dual
 
     solve_batch = jax.jit(jax.vmap(solve_one))
 
     warmup_start = time.perf_counter()
     warmup = solve_batch(states, controls, params, admm_state)
-    jax.block_until_ready(warmup.states)
+    jax.block_until_ready(warmup)
     warmup_s = time.perf_counter() - warmup_start
     print(f"warmup_compile_and_run={warmup_s:.3f}s", flush=True)
 
@@ -244,7 +269,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
 
         sqp_start = time.perf_counter()
         params = jnp.asarray(params_np)
-        solution = solve_batch(states, controls, params, admm_state)
+        solution, primal, dual = solve_batch(states, controls, params, admm_state)
         (
             states,
             controls,
@@ -252,7 +277,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             step_len,
             eq_violation,
             ineq_violation,
-            convergence_error,
+            primal,
+            dual,
         ) = jax.block_until_ready(
             (
                 solution.states,
@@ -261,7 +287,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 solution.linesearch_alphas[:, -1],
                 solution.solver_stats.eq_constraints_violations[:, -1],
                 solution.solver_stats.ineq_constraints_violations[:, -1],
-                solution.convergence_error,
+                primal,
+                dual,
             )
         )
         sqp_sync_s = time.perf_counter() - sqp_start
@@ -273,8 +300,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         violations.append(
             np.asarray(jax.device_get(eq_violation + ineq_violation))
         )
-        prim_res.append(np.asarray(jax.device_get(eq_violation)))
-        dual_res.append(np.asarray(jax.device_get(convergence_error)))
+        prim_res.append(np.asarray(jax.device_get(primal)))
+        dual_res.append(np.asarray(jax.device_get(dual)))
         step_param_update_s.append(param_update_s)
         step_sqp_sync_s.append(sqp_sync_s)
         step_total_s.append(time.perf_counter() - step_start)
@@ -289,6 +316,13 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     step_param_update_s_arr = np.asarray(step_param_update_s, dtype=np.float64)
     step_sqp_sync_s_arr = np.asarray(step_sqp_sync_s, dtype=np.float64)
     time_grid = np.arange(args.sim_steps + 1, dtype=np.float64) * args.control_dt
+    if args.output_npz is not None:
+        args.output_npz.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            args.output_npz, time=time_grid, q=q_arr, step_lengths=step_lengths_arr,
+            constraint_violations=violations_arr, prim_res=prim_res_arr,
+            dual_res=dual_res_arr,
+        )
 
     if not args.skip_plots:
         _plot_base_distribution(args.plot_path, time_grid, q_arr)
@@ -340,6 +374,12 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "rho": args.rho,
         "sigma": args.sigma,
         "alpha": args.alpha,
+        "scaling": args.scaling,
+        "turbompc_matmul_precision": "highest" if args.scaling else (
+            jax.config.jax_default_matmul_precision or "default"
+        ),
+        "qp_residual_definition": "original_units_admm_split_primal_and_stationarity",
+        "finite_qp_fraction": float(np.mean(np.isfinite(prim_res_arr) & np.isfinite(dual_res_arr))),
         "n_variables": desc.n_variables,
         "n_constraints": desc.n_constraints,
         "nnz_p": desc.nnz_p,
@@ -366,7 +406,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         f"closed-loop elapsed={elapsed_s:.3f}s "
         f"({throughput:.3g} SQP-RTI steps/s), "
         f"mean_step={summary['mean_step']:.3g}, "
-        f"max_violation={summary['max_violation']:.3e}",
+        f"max_violation={summary['max_violation']:.3e}, "
+        f"mean_qp_res=({summary['mean_qp_prim']:.2e}, {summary['mean_qp_dual']:.2e})",
         flush=True,
     )
     return summary
@@ -397,6 +438,9 @@ def main() -> None:
     parser.add_argument("--turbompc-eps-rel", type=float, default=1e-3)
     parser.add_argument("--rho", type=float, default=None)
     parser.add_argument("--sigma", type=float, default=1e-6)
+    parser.add_argument("--scaling", type=int, default=None,
+                        help="Fixed Ruiz passes, matching WarpMPC (YAML default); "
+                             "0 reproduces the legacy unscaled/default-precision path.")
     parser.add_argument("--alpha", type=float, default=None)
     parser.add_argument("--line-search-step-min", type=float, default=None)
     parser.add_argument("--turbompc-forward-backend", default="admm_fused_cudss")
@@ -407,6 +451,7 @@ def main() -> None:
     parser.add_argument("--throughput-csv-path", type=pathlib.Path, default=None)
     parser.add_argument("--skip-plots", action="store_true")
     parser.add_argument("--summary-json", type=pathlib.Path, default=None)
+    parser.add_argument("--output-npz", type=pathlib.Path, default=None)
     args = parser.parse_args()
     if args.parameters is None:
         args.parameters = pathlib.Path(__file__).resolve().parents[1] / "problems" / "humanoid_mpc_parameters.yaml"

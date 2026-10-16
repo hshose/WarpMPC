@@ -90,6 +90,10 @@ MARKERS = {
 }
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class CpuQdldlTiming:
     factor_s_per_system: float
@@ -598,70 +602,71 @@ def main() -> None:
                 )
 
             for batch in _parse_batches(args.batch_sizes):
-                estimate = _estimate_bytes(batch, plan.n, plan.nnz_a, plan.nnz_l, dtype)
-                if estimate > max_bytes:
-                    print(f"  {batch}: skipped over {_format_gb(estimate)}")
-                    break
+                with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, variant=variant_name)):
+                    estimate = _estimate_bytes(batch, plan.n, plan.nnz_a, plan.nnz_l, dtype)
+                    if estimate > max_bytes:
+                        print(f"  {batch}: skipped over {_format_gb(estimate)}")
+                        break
 
-                values = sample_kkt_values(
-                    kkt,
-                    batch_size=batch,
-                    seed=args.seed + batch,
-                    variation=args.variation,
-                    dtype=dtype,
-                )
-                rhs = np.random.default_rng(args.seed + 1000 + batch).standard_normal(
-                    (batch, plan.n)
-                ).astype(dtype)
-                values_in = _values_for_layout(plan, values, compiled.values_layout)
-                rhs_in = _rhs_for_layout(rhs, compiled.rhs_layout)
-                values_jax = jnp.asarray(values_in)
-                rhs_jax = jnp.asarray(rhs_in)
+                    values = sample_kkt_values(
+                        kkt,
+                        batch_size=batch,
+                        seed=args.seed + batch,
+                        variation=args.variation,
+                        dtype=dtype,
+                    )
+                    rhs = np.random.default_rng(args.seed + 1000 + batch).standard_normal(
+                        (batch, plan.n)
+                    ).astype(dtype)
+                    values_in = _values_for_layout(plan, values, compiled.values_layout)
+                    rhs_in = _rhs_for_layout(rhs, compiled.rhs_layout)
+                    values_jax = jnp.asarray(values_in)
+                    rhs_jax = jnp.asarray(rhs_in)
 
-                try:
-                    factor_exe, factor_out = _compile_and_warm(compiled.factor, values_jax)
-                    lx, _, dinv = factor_out
-                    solve_exe, _ = _compile_and_warm(compiled.solve, lx, dinv, rhs_jax)
-                    factor_solve_exe, _ = _compile_and_warm(
-                        compiled.factor_and_solve, values_jax, rhs_jax
-                    )
-                    factor_s, factor_out = _time_compiled(
-                        factor_exe, values_jax, repeat=args.repeat
-                    )
-                    lx, _, dinv = factor_out
-                    solve_s, _ = _time_compiled(
-                        solve_exe, lx, dinv, rhs_jax, repeat=args.repeat
-                    )
-                    factor_solve_s, _ = _time_compiled(
-                        factor_solve_exe, values_jax, rhs_jax, repeat=args.repeat
-                    )
-                except Exception as exc:
-                    print(f"  {batch}: failed {type(exc).__name__}: {exc}")
-                    break
+                    try:
+                        factor_exe, factor_out = _compile_and_warm(compiled.factor, values_jax)
+                        lx, _, dinv = factor_out
+                        solve_exe, _ = _compile_and_warm(compiled.solve, lx, dinv, rhs_jax)
+                        factor_solve_exe, _ = _compile_and_warm(
+                            compiled.factor_and_solve, values_jax, rhs_jax
+                        )
+                        factor_s, factor_out = _time_compiled(
+                            factor_exe, values_jax, repeat=args.repeat
+                        )
+                        lx, _, dinv = factor_out
+                        solve_s, _ = _time_compiled(
+                            solve_exe, lx, dinv, rhs_jax, repeat=args.repeat
+                        )
+                        factor_solve_s, _ = _time_compiled(
+                            factor_solve_exe, values_jax, rhs_jax, repeat=args.repeat
+                        )
+                    except Exception as exc:
+                        print(f"  {batch}: failed {type(exc).__name__}: {exc}")
+                        break
 
-                key = (dtype.name, batch)
-                if variant_name == "baseline":
-                    baseline_times[key] = factor_solve_s
-                baseline_time = baseline_times.get(key)
-                row = VariantResult(
-                    variant=variant_name,
-                    dtype=dtype.name,
-                    batch_size=batch,
-                    estimated_bytes=estimate,
-                    factor_s=factor_s,
-                    solve_s=solve_s,
-                    factor_solve_s=factor_solve_s,
-                    baseline_factor_solve_s=baseline_time,
-                    cpu_timing=cpu_timing,
-                )
-                results.append(row)
-                speed = row.speedup_vs_baseline
-                speed_text = "-" if speed is None else f"{speed:.3f}x"
-                print(
-                    f"  {batch}: factor={factor_s:.6f}s solve={solve_s:.6f}s "
-                    f"total={factor_solve_s:.6f}s throughput={row.systems_per_s:.2f}/s "
-                    f"speedup={speed_text}"
-                )
+                    key = (dtype.name, batch)
+                    if variant_name == "baseline":
+                        baseline_times[key] = factor_solve_s
+                    baseline_time = baseline_times.get(key)
+                    row = VariantResult(
+                        variant=variant_name,
+                        dtype=dtype.name,
+                        batch_size=batch,
+                        estimated_bytes=estimate,
+                        factor_s=factor_s,
+                        solve_s=solve_s,
+                        factor_solve_s=factor_solve_s,
+                        baseline_factor_solve_s=baseline_time,
+                        cpu_timing=cpu_timing,
+                    )
+                    results.append(row)
+                    speed = row.speedup_vs_baseline
+                    speed_text = "-" if speed is None else f"{speed:.3f}x"
+                    print(
+                        f"  {batch}: factor={factor_s:.6f}s solve={solve_s:.6f}s "
+                        f"total={factor_solve_s:.6f}s throughput={row.systems_per_s:.2f}/s "
+                        f"speedup={speed_text}"
+                    )
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

@@ -33,6 +33,10 @@ from benchmarks.problems import batched_problem_data, make_linear_mpc
 from warpmpc.jax_osqp import OSQPSettings, build_osqp_plan
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 class DTypeStableOSQPLUSolver:
     """JAXopt LU solver variant that keeps float32 factorizations in float32."""
 
@@ -554,55 +558,56 @@ def main() -> None:
         for mode in modes:
             print(f"Benchmark dtype={dtype.name} mode={mode}")
             for batch in _parse_ints(args.batch_sizes):
-                estimate = _estimate_bytes(batch, plan.n, plan.m, dtype, mode=mode)
-                if estimate > max_bytes:
-                    print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                    break
-                _, _, q, l, u = batched_problem_data(
-                    problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
-                )
-                q_jax = jnp.asarray(q)
-                l_jax = jnp.asarray(l)
-                u_jax = jnp.asarray(u)
-                try:
-                    if mode == "solve":
-                        compiled, _ = _compile_and_warm(solve_fn, q_jax, l_jax, u_jax)
-                        elapsed, _ = _time_compiled(compiled, q_jax, l_jax, u_jax, repeat=args.repeat)
-                    else:
-                        rng = np.random.default_rng(args.seed + 1000 + batch)
-                        x_weights = jnp.asarray(rng.standard_normal((batch, plan.n)).astype(dtype))
-                        y_weights = jnp.asarray(rng.standard_normal((batch, plan.m)).astype(dtype))
-                        compiled, _ = _compile_and_warm(grad_fn, q_jax, l_jax, u_jax, x_weights, y_weights)
-                        elapsed, _ = _time_compiled(
-                            compiled,
-                            q_jax,
-                            l_jax,
-                            u_jax,
-                            x_weights,
-                            y_weights,
-                            repeat=args.repeat,
-                        )
-                except Exception as exc:
-                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                    break
-                row = BatchResult(
-                    solver="boxosqp",
-                    mode=mode,
-                    dtype=dtype.name,
-                    batch_size=batch,
-                    horizon=args.horizon,
-                    n=plan.n,
-                    m=plan.m,
-                    eq_qp_solve=args.eq_qp_solve,
-                    implicit_diff=args.implicit_diff,
-                    max_iter=args.max_iter,
-                    elapsed_s=elapsed,
-                    max_abs_x_vs_cpu=max_x,
-                    max_abs_obj_vs_cpu=max_obj,
-                    cpu_throughput=cpu_throughput,
-                )
-                rows.append(row)
-                print(f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s")
+                with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, mode=mode)):
+                    estimate = _estimate_bytes(batch, plan.n, plan.m, dtype, mode=mode)
+                    if estimate > max_bytes:
+                        print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                        break
+                    _, _, q, l, u = batched_problem_data(
+                        problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
+                    )
+                    q_jax = jnp.asarray(q)
+                    l_jax = jnp.asarray(l)
+                    u_jax = jnp.asarray(u)
+                    try:
+                        if mode == "solve":
+                            compiled, _ = _compile_and_warm(solve_fn, q_jax, l_jax, u_jax)
+                            elapsed, _ = _time_compiled(compiled, q_jax, l_jax, u_jax, repeat=args.repeat)
+                        else:
+                            rng = np.random.default_rng(args.seed + 1000 + batch)
+                            x_weights = jnp.asarray(rng.standard_normal((batch, plan.n)).astype(dtype))
+                            y_weights = jnp.asarray(rng.standard_normal((batch, plan.m)).astype(dtype))
+                            compiled, _ = _compile_and_warm(grad_fn, q_jax, l_jax, u_jax, x_weights, y_weights)
+                            elapsed, _ = _time_compiled(
+                                compiled,
+                                q_jax,
+                                l_jax,
+                                u_jax,
+                                x_weights,
+                                y_weights,
+                                repeat=args.repeat,
+                            )
+                    except Exception as exc:
+                        print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                        break
+                    row = BatchResult(
+                        solver="boxosqp",
+                        mode=mode,
+                        dtype=dtype.name,
+                        batch_size=batch,
+                        horizon=args.horizon,
+                        n=plan.n,
+                        m=plan.m,
+                        eq_qp_solve=args.eq_qp_solve,
+                        implicit_diff=args.implicit_diff,
+                        max_iter=args.max_iter,
+                        elapsed_s=elapsed,
+                        max_abs_x_vs_cpu=max_x,
+                        max_abs_obj_vs_cpu=max_obj,
+                        cpu_throughput=cpu_throughput,
+                    )
+                    rows.append(row)
+                    print(f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s")
 
     horizon_rows: list[HorizonResult] = []
     horizon_batches = sorted(_parse_ints(args.horizon_batch_sizes), reverse=True)
@@ -627,43 +632,44 @@ def main() -> None:
                     f"kkt_dim={horizon_plan.qdldl_plan.n} kkt_nnz={horizon_plan.nnz_kkt}"
                 )
                 for batch in horizon_batches:
-                    estimate = _estimate_bytes(batch, horizon_plan.n, horizon_plan.m, dtype, mode="solve")
-                    if estimate > max_bytes:
-                        print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                        continue
-                    _, _, q, l, u = batched_problem_data(
-                        horizon_problem,
-                        batch,
-                        dtype,
-                        seed=args.seed + 4000 + horizon + batch,
-                        x0_variation=0.15,
-                    )
-                    q_jax = jnp.asarray(q)
-                    l_jax = jnp.asarray(l)
-                    u_jax = jnp.asarray(u)
-                    try:
-                        compiled, _ = _compile_and_warm(horizon_solve, q_jax, l_jax, u_jax)
-                        elapsed, _ = _time_compiled(compiled, q_jax, l_jax, u_jax, repeat=args.repeat)
-                    except Exception as exc:
-                        print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                        continue
-                    row = HorizonResult(
-                        solver="boxosqp",
-                        dtype=dtype.name,
-                        horizon=horizon,
-                        batch_size=batch,
-                        n=horizon_plan.n,
-                        m=horizon_plan.m,
-                        kkt_dim=horizon_plan.qdldl_plan.n,
-                        kkt_nnz=horizon_plan.nnz_kkt,
-                        eq_qp_solve=args.eq_qp_solve,
-                        implicit_diff=args.implicit_diff,
-                        max_iter=args.max_iter,
-                        elapsed_s=elapsed,
-                    )
-                    horizon_rows.append(row)
-                    print(f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s")
-                    break
+                    with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, horizon=horizon)):
+                        estimate = _estimate_bytes(batch, horizon_plan.n, horizon_plan.m, dtype, mode="solve")
+                        if estimate > max_bytes:
+                            print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                            continue
+                        _, _, q, l, u = batched_problem_data(
+                            horizon_problem,
+                            batch,
+                            dtype,
+                            seed=args.seed + 4000 + horizon + batch,
+                            x0_variation=0.15,
+                        )
+                        q_jax = jnp.asarray(q)
+                        l_jax = jnp.asarray(l)
+                        u_jax = jnp.asarray(u)
+                        try:
+                            compiled, _ = _compile_and_warm(horizon_solve, q_jax, l_jax, u_jax)
+                            elapsed, _ = _time_compiled(compiled, q_jax, l_jax, u_jax, repeat=args.repeat)
+                        except Exception as exc:
+                            print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                            continue
+                        row = HorizonResult(
+                            solver="boxosqp",
+                            dtype=dtype.name,
+                            horizon=horizon,
+                            batch_size=batch,
+                            n=horizon_plan.n,
+                            m=horizon_plan.m,
+                            kkt_dim=horizon_plan.qdldl_plan.n,
+                            kkt_nnz=horizon_plan.nnz_kkt,
+                            eq_qp_solve=args.eq_qp_solve,
+                            implicit_diff=args.implicit_diff,
+                            max_iter=args.max_iter,
+                            elapsed_s=elapsed,
+                        )
+                        horizon_rows.append(row)
+                        print(f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s")
+                        break
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

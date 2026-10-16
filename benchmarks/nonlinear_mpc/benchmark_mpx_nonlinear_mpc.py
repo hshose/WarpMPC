@@ -27,6 +27,10 @@ PREFIXES = {
 }
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import record_vram_case
+
 def _parse_ints(text: str) -> list[int]:
     return [int(part.strip()) for part in text.split(",") if part.strip()]
 
@@ -290,6 +294,7 @@ def _humanoid_args(
     return cmd
 
 
+@record_vram_case
 def run_batch(
     args: argparse.Namespace,
     *,

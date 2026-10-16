@@ -1,0 +1,9 @@
+# Install alongside WarpMPC in a CUDA-enabled JAX environment.
+# Versions/pin from the bundled reference environment.
+warp-lang==1.17.0
+newton @ https://github.com/newton-physics/newton/archive/45458023f24629c1feffb1f336594808f537db14.tar.gz
+mujoco==3.12.0
+mujoco-warp==3.12.0
+pin==4.1.0
+trimesh==5.1.0
+pillow==12.3.0

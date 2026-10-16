@@ -365,6 +365,7 @@ def _make_sqp(args: argparse.Namespace, dtype: np.dtype):
         rail_constraint=args.enable_rail_constraint,
     )
     plan = build_sparse_mpc_plan(problem, osqp_settings=settings)
+    mpax_iteration_limit = getattr(args, "mpax_iteration_limit", None)
     sqp = compile_sparse_mpc_sqp(
         problem,
         plan,
@@ -372,9 +373,9 @@ def _make_sqp(args: argparse.Namespace, dtype: np.dtype):
         qp_solver=getattr(args, "qp_solver", "jax_osqp"),
         osqp_settings=settings,
         mpax_settings=MPAXSettings(
-            eps_abs=getattr(args, "mpax_eps_abs", 1e-3),
-            eps_rel=getattr(args, "mpax_eps_rel", 1e-3),
-            iteration_limit=getattr(args, "mpax_iteration_limit", None) or args.osqp_max_iter,
+            eps_abs=getattr(args, "mpax_eps_abs", 1e-4),
+            eps_rel=getattr(args, "mpax_eps_rel", 1e-4),
+            iteration_limit=500 if mpax_iteration_limit is None else mpax_iteration_limit,
             termination_evaluation_frequency=getattr(
                 args,
                 "mpax_termination_evaluation_frequency",
@@ -384,6 +385,11 @@ def _make_sqp(args: argparse.Namespace, dtype: np.dtype):
             pock_chambolle_alpha=getattr(args, "mpax_pock_chambolle_alpha", 1.0),
             regularization=getattr(args, "mpax_regularization", 0.0),
             unroll=getattr(args, "mpax_unroll", False),
+            warm_start=getattr(args, "mpax_warm_start", True),
+            warm_start_primal=getattr(args, "mpax_warm_start_primal", True),
+            warm_start_primal_scale=getattr(args, "mpax_warm_start_primal_scale", 1.0),
+            primal_importance=getattr(args, "mpax_primal_importance", 0.1),
+            scale_invariant_initial_primal_weight=getattr(args, "mpax_scale_invariant_initial_primal_weight", False),
         ),
         transpose_work=getattr(args, "transpose_work", True),
         segmented=getattr(args, "segmented", True),

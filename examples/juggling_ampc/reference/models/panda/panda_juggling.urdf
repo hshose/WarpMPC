@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="panda_juggling">
+  <!--Derived from Franka franka_ros, Apache-2.0; see models/panda/README.md. No gripper.-->
+  <link name="panda_link0" />
+  <link name="panda_link1">
+    <inertial>
+      <origin xyz="0.003875 0.002081 -0.04762" rpy="0 0 0" />
+      <mass value="4.970684" />
+      <inertia ixx="0.70337" iyy="0.70661" izz="0.009117" ixy="-0.000139" ixz="0.006772" iyz="0.019169" />
+    </inertial>
+  </link>
+  <joint name="panda_joint1" type="revolute">
+    <parent link="panda_link0" />
+    <child link="panda_link1" />
+    <origin xyz="0 0 0.333" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.8973" upper="2.8973" velocity="2.175" effort="87.0" />
+  </joint>
+  <link name="panda_link2">
+    <inertial>
+      <origin xyz="-0.003141 -0.02872  0.003495" rpy="0 0 0" />
+      <mass value="0.646926" />
+      <inertia ixx="0.007962" iyy="0.02811" izz="0.025995" ixy="-0.003925" ixz="0.010254" iyz="0.000704" />
+    </inertial>
+  </link>
+  <joint name="panda_joint2" type="revolute">
+    <parent link="panda_link1" />
+    <child link="panda_link2" />
+    <origin xyz="0 0 0" rpy="-1.570796326794897 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.7628" upper="1.7628" velocity="2.175" effort="87.0" />
+  </joint>
+  <link name="panda_link3">
+    <inertial>
+      <origin xyz="2.7518e-02 3.9252e-02 -6.6502e-02" rpy="0 0 0" />
+      <mass value="3.228604" />
+      <inertia ixx="0.037242" iyy="0.036155" izz="0.01083" ixy="-0.004761" ixz="-0.011396" iyz="-0.012805" />
+    </inertial>
+  </link>
+  <joint name="panda_joint3" type="revolute">
+    <parent link="panda_link2" />
+    <child link="panda_link3" />
+    <origin xyz="0 -0.316 0" rpy="1.570796326794897 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.8973" upper="2.8973" velocity="2.175" effort="87.0" />
+  </joint>
+  <link name="panda_link4">
+    <inertial>
+      <origin xyz="-5.317e-02 1.04419e-01 2.7454e-02" rpy="0 0 0" />
+      <mass value="3.587895" />
+      <inertia ixx="0.025853" iyy="0.019552" izz="0.028323" ixy="0.007796" ixz="-0.001332" iyz="0.008641" />
+    </inertial>
+  </link>
+  <joint name="panda_joint4" type="revolute">
+    <parent link="panda_link3" />
+    <child link="panda_link4" />
+    <origin xyz="0.0825 0 0" rpy="1.570796326794897 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.0718" upper="-0.0698" velocity="2.175" effort="87.0" />
+  </joint>
+  <link name="panda_link5">
+    <inertial>
+      <origin xyz="-1.1953e-02 4.1065e-02 -3.8437e-02" rpy="0 0 0" />
+      <mass value="1.225946" />
+      <inertia ixx="0.035549" iyy="0.029474" izz="0.008627" ixy="-0.002117" ixz="-0.004037" iyz="0.000229" />
+    </inertial>
+  </link>
+  <joint name="panda_joint5" type="revolute">
+    <parent link="panda_link4" />
+    <child link="panda_link5" />
+    <origin xyz="-0.0825 0.384 0" rpy="-1.570796326794897 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.8973" upper="2.8973" velocity="2.61" effort="12.0" />
+  </joint>
+  <link name="panda_link6">
+    <inertial>
+      <origin xyz="6.0149e-02 -1.4117e-02 -1.0517e-02" rpy="0 0 0" />
+      <mass value="1.666555" />
+      <inertia ixx="0.001964" iyy="0.004354" izz="0.005433" ixy="0.000109" ixz="-0.001158" iyz="0.000341" />
+    </inertial>
+  </link>
+  <joint name="panda_joint6" type="revolute">
+    <parent link="panda_link5" />
+    <child link="panda_link6" />
+    <origin xyz="0 0 0" rpy="1.570796326794897 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.0175" upper="3.7525" velocity="2.61" effort="12.0" />
+  </joint>
+  <link name="panda_link7">
+    <inertial>
+      <origin xyz="1.0517e-02 -4.252e-03 6.1597e-02" rpy="0 0 0" />
+      <mass value="0.735522" />
+      <inertia ixx="0.012516" iyy="0.010027" izz="0.004815" ixy="-0.000428" ixz="-0.001196" iyz="-0.000741" />
+    </inertial>
+  </link>
+  <joint name="panda_joint7" type="revolute">
+    <parent link="panda_link6" />
+    <child link="panda_link7" />
+    <origin xyz="0.08799999999999999 0 0" rpy="1.570796326794897 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.8973" upper="2.8973" velocity="2.61" effort="12.0" />
+  </joint>
+  <link name="panda_link8">
+    <inertial>
+      <origin xyz="0.04285714285714285 0 0.05571428571428571" rpy="0 0 0" />
+      <mass value="0.07" />
+      <inertia ixx="3.521428571428572e-05" ixy="0.0" ixz="-2.7857142857142858e-05" iyy="0.0001388095238095238" iyz="0.0" izz="0.00012226190476190477" />
+    </inertial>
+  </link>
+  <joint name="panda_joint8" type="fixed">
+    <parent link="panda_link7" />
+    <child link="panda_link8" />
+    <origin xyz="0 0 0.107" rpy="0 0 0" />
+  </joint>
+  <link name="paddle">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.18" />
+      <inertia ixx="0.0002552849999999999" iyy="0.0002552849999999999" izz="0.00050625" ixy="0.0" ixz="0.0" iyz="0.0" />
+    </inertial>
+  </link>
+  <joint name="panda_joint9" type="fixed">
+    <parent link="panda_link8" />
+    <child link="paddle" />
+    <origin xyz="0.16 0 0.04" rpy="3.141592653589793 0 0" />
+  </joint>
+</robot>

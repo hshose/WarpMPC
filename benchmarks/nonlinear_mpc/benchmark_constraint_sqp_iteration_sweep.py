@@ -70,6 +70,10 @@ ADDITIONAL_CONSTRAINT_FIELDS = [
 ]
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import record_vram_case
+
 def _parse_csv(text: str) -> list[str]:
     return [item.strip() for item in text.split(",") if item.strip()]
 
@@ -655,6 +659,7 @@ def _write_csv(path: pathlib.Path, rows: list[dict[str, object]]) -> None:
             writer.writerow({key: row.get(key, "") for key in fieldnames})
 
 
+@record_vram_case
 def run_case(args: argparse.Namespace, system: str, solver: str, sqp_iterations: int) -> dict[str, object]:
     prefix = _base_output_prefix(args, system, solver, sqp_iterations)
     summary_json = prefix.with_suffix(".json")

@@ -1,0 +1,206 @@
+diff --git a/mpax/rapdhg.py b/mpax/rapdhg.py
+index ce10e3f..95c23f1 100644
+--- a/mpax/rapdhg.py
++++ b/mpax/rapdhg.py
+@@ -334,6 +334,10 @@ class raPDHG(abc.ABC):
+     infeasibility_detection: bool = True
+ 
+     def check_config(self, is_lp: bool):
++        if self.iteration_limit < 0:
++            raise ValueError("iteration_limit must be nonnegative")
++        if self.termination_evaluation_frequency < 1:
++            raise ValueError("termination_evaluation_frequency must be positive")
+         if not is_lp:
+             self.infeasibility_detection = False
+             self.primal_weight_update_smoothing = 0.2
+@@ -636,14 +640,59 @@ class raPDHG(abc.ABC):
+         problem : QuadraticProgrammingProblem
+             The problem being solved.
+         """
++        if self.unroll:
++            # Reverse-mode autodiff requires a static loop bound. Mask the
++            # tail of the final block rather than using a dynamic bound.
++            return jax.lax.fori_loop(
++                0,
++                self.termination_evaluation_frequency,
++                lambda i, state: jax.lax.cond(
++                    state.num_iterations < self.iteration_limit,
++                    lambda s: self.take_step(s, problem),
++                    lambda s: s,
++                    state,
++                ),
++                solver_state,
++            )
+         new_solver_state = jax.lax.fori_loop(
+             lower=0,
+-            upper=self.termination_evaluation_frequency,
++            upper=jnp.minimum(
++                self.termination_evaluation_frequency,
++                jnp.maximum(self.iteration_limit - solver_state.num_iterations, 0),
++            ),
+             body_fun=lambda i, x: self.take_step(x, problem),
+             init_val=solver_state,
+         )
+         return new_solver_state
+ 
++    def take_main_steps(self, solver_state, problem):
++        """Use static inner bounds while returning the exact iteration cap.
++
++        Main solves start with min(10, limit) iterations, then advance in
++        fixed-size blocks. Under vmap, a dynamic inner loop bound introduces
++        per-iteration masking and batch-wide termination reductions. Split
++        at the known final-block length instead, selecting that snapshot
++        only for the partial final block. Any computed tail is discarded.
++        Feasibility-polishing loops retain the general bounded helper.
++        """
++        startup = min(10, self.iteration_limit)
++        if self.iteration_limit <= startup:
++            return solver_state
++        frequency = self.termination_evaluation_frequency
++        tail = (self.iteration_limit - startup) % frequency
++        partial_state = jax.lax.fori_loop(
++            0, tail, lambda i, state: self.take_step(state, problem), solver_state
++        )
++        full_state = jax.lax.fori_loop(
++            tail, frequency,
++            lambda i, state: self.take_step(state, problem), partial_state
++        )
++        return jax.lax.cond(
++            solver_state.num_iterations + frequency > self.iteration_limit,
++            lambda: partial_state,
++            lambda: full_state,
++        )
++
+     def initial_iteration_update(
+         self,
+         solver_state,
+@@ -722,14 +771,23 @@ class raPDHG(abc.ABC):
+         tuple
+             The updated solver state, the updated last restart info, whether to terminate, the scaled problem, and the cached quadratic programming information.
+         """
+-        # Check for termination
++        restarted_state, new_last_restart_info = run_restart_scheme(
++            scaled_problem.scaled_qp,
++            solver_state,
++            last_restart_info,
++            self._restart_params,
++            self.optimality_norm,
++        )
++        new_solver_state = self.take_main_steps(restarted_state, scaled_problem.scaled_qp)
++        # Check the iterate that will be returned. The outer loop preserves
++        # already-terminated batch members, without a speculative extra block.
+         new_should_terminate, new_termination_status, new_convergence_information = (
+             check_termination_criteria(
+                 scaled_problem,
+-                solver_state,
++                new_solver_state,
+                 self._termination_criteria,
+                 qp_cache,
+-                solver_state.numerical_error,
++                new_solver_state.numerical_error,
+                 1.0,
+                 self.optimality_norm,
+                 average=True,
+@@ -737,17 +795,6 @@ class raPDHG(abc.ABC):
+             )
+         )
+ 
+-        restarted_solver_state, new_last_restart_info = run_restart_scheme(
+-            scaled_problem.scaled_qp,
+-            solver_state,
+-            last_restart_info,
+-            self._restart_params,
+-            self.optimality_norm,
+-        )
+-
+-        new_solver_state = self.take_multiple_steps(
+-            restarted_solver_state, scaled_problem.scaled_qp
+-        )
+         new_solver_state.termination_status = new_termination_status
+         return (
+             new_solver_state,
+@@ -983,23 +1030,37 @@ class raPDHG(abc.ABC):
+             cond_fun=lambda state: state[2] == False,
+             body_fun=lambda state: self.initial_iteration_update(*state),
+             init_val=(solver_state, last_restart_info, False, scaled_problem, qp_cache),
+-            maxiter=10,
++            maxiter=min(10, self.iteration_limit),
+             unroll=self.unroll,
+             jit=self.jit,
+         )
+ 
++        should_terminate, status, ci = check_termination_criteria(
++            scaled_problem,
++            solver_state,
++            self._termination_criteria,
++            qp_cache,
++            solver_state.numerical_error,
++            1.0,
++            self.optimality_norm,
++            average=True,
++            infeasibility_detection=self.infeasibility_detection,
++        )
++        solver_state.termination_status = status
++        remaining = max(self.iteration_limit - min(10, self.iteration_limit), 0)
++        max_blocks = (remaining + self.termination_evaluation_frequency - 1) // self.termination_evaluation_frequency
+         (solver_state, last_restart_info, should_terminate, _, _, ci) = while_loop(
+             cond_fun=lambda state: state[2] == False,
+             body_fun=lambda state: self.main_iteration_update(*state),
+             init_val=(
+                 solver_state,
+                 last_restart_info,
+-                False,
++                should_terminate,
+                 scaled_problem,
+                 qp_cache,
+-                ConvergenceInformation(),
++                ci,
+             ),
+-            maxiter=self.iteration_limit,
++            maxiter=max_blocks,
+             unroll=self.unroll,
+             jit=self.jit,
+         )
+@@ -1079,7 +1140,7 @@ class raPDHG(abc.ABC):
+             solver_state.avg_primal_solution,
+             solver_state.avg_dual_solution,
+             solver_state.termination_status,
+-            solver_state.num_iterations - 1,
++            solver_state.num_iterations,
+             ci,
+             timing,
+         )
+diff --git a/mpax/restart.py b/mpax/restart.py
+index 5389852..d665f1b 100644
+--- a/mpax/restart.py
++++ b/mpax/restart.py
+@@ -168,7 +168,7 @@ def compute_weight_kkt_residual(
+     )
+ 
+     reduced_costs, reduced_costs_violation = compute_reduced_costs_from_primal_gradient(
+-        problem.objective_vector - dual_product,
++        problem.objective_vector - dual_product + primal_obj_product,
+         problem.isfinite_variable_lower_bound,
+         problem.isfinite_variable_upper_bound,
+     )
+@@ -186,12 +186,17 @@ def compute_weight_kkt_residual(
+     dual_residual = jnp.where(
+         problem.inequalities_mask, jnp.maximum(-dual_iterate, 0.0), 0.0
+     )
+-    dual_residual_norm = jnp.linalg.norm(dual_residual, ord=norm_ord)
++    dual_residual_norm = jnp.linalg.norm(
++        jnp.concatenate([dual_residual, reduced_costs_violation]), ord=norm_ord
++    )
+     relative_dual_residual_norm = dual_residual_norm / (
+         1
+         + jnp.maximum(
+-            jnp.linalg.norm(problem.right_hand_side, ord=norm_ord),
+-            jnp.linalg.norm(primal_product, ord=norm_ord),
++            jnp.maximum(
++                jnp.linalg.norm(problem.objective_vector, ord=norm_ord),
++                jnp.linalg.norm(primal_obj_product, ord=norm_ord),
++            ),
++            jnp.linalg.norm(dual_product, ord=norm_ord),
+         )
+     )
+     absolute_gap = jnp.abs(primal_objective - dual_objective)

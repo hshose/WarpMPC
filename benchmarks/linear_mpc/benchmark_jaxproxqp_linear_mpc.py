@@ -36,6 +36,10 @@ from jaxproxqp.qp_problems import QPModel
 from jaxproxqp.settings import Settings
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class JaxProxQPProblem:
     h_matrix: np.ndarray
@@ -465,64 +469,65 @@ def main() -> None:
             print(f"  check max_abs_x={max_x:.3e} max_abs_obj={max_obj:.3e}")
 
         for batch in _parse_ints(args.batch_sizes):
-            estimate = _estimate_bytes(batch, qp, dtype)
-            if estimate > max_bytes:
-                print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                continue
-            _, _, q, l, u = batched_problem_data(
-                problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
-            )
-            b, c_l, c_u = _jaxproxqp_bounds(qp, l, u, dtype, args.bound_value)
-            try:
-                q_jax = jnp.asarray(q)
-                b_jax = jnp.asarray(b)
-                c_l_jax = jnp.asarray(c_l)
-                c_u_jax = jnp.asarray(c_u)
-                compiled, _ = _compile_and_warm(solve_fn, q_jax, b_jax, c_l_jax, c_u_jax)
-                elapsed, out = _time_compiled(
-                    compiled,
-                    q_jax,
-                    b_jax,
-                    c_l_jax,
-                    c_u_jax,
-                    repeat=args.repeat,
+            with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype)):
+                estimate = _estimate_bytes(batch, qp, dtype)
+                if estimate > max_bytes:
+                    print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                    continue
+                _, _, q, l, u = batched_problem_data(
+                    problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
                 )
-            except Exception as exc:
-                print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                continue
-            _, _, pri_res, dua_res, duality_gap, iter_ext, iter_inner, _ = jax.device_get(out)
-            row = BatchResult(
-                solver="jaxproxqp",
-                mode="solve",
-                dtype=dtype.name,
-                batch_size=batch,
-                horizon=args.horizon,
-                n=qp.n,
-                m=problem.l.size,
-                n_eq=qp.n_eq,
-                n_ineq=qp.n_ineq,
-                max_iter=args.max_iter,
-                max_iter_in=args.max_iter_in,
-                solver_tol=args.solver_tol,
-                regularization=args.regularization,
-                elapsed_s=elapsed,
-                mean_outer_iterations=float(np.mean(iter_ext)),
-                max_outer_iterations=int(np.max(iter_ext)),
-                mean_inner_iterations=float(np.mean(iter_inner)),
-                max_inner_iterations=int(np.max(iter_inner)),
-                max_primal_residual=float(np.max(pri_res)),
-                max_dual_residual=float(np.max(dua_res)),
-                max_duality_gap=float(np.max(duality_gap)),
-                max_abs_x_vs_cpu=max_x,
-                max_abs_obj_vs_cpu=max_obj,
-                cpu_throughput=cpu_throughput,
-            )
-            rows.append(row)
-            print(
-                f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s "
-                f"outer_mean={row.mean_outer_iterations:.1f} inner_mean={row.mean_inner_iterations:.1f} "
-                f"pri={row.max_primal_residual:.2e} dua={row.max_dual_residual:.2e}"
-            )
+                b, c_l, c_u = _jaxproxqp_bounds(qp, l, u, dtype, args.bound_value)
+                try:
+                    q_jax = jnp.asarray(q)
+                    b_jax = jnp.asarray(b)
+                    c_l_jax = jnp.asarray(c_l)
+                    c_u_jax = jnp.asarray(c_u)
+                    compiled, _ = _compile_and_warm(solve_fn, q_jax, b_jax, c_l_jax, c_u_jax)
+                    elapsed, out = _time_compiled(
+                        compiled,
+                        q_jax,
+                        b_jax,
+                        c_l_jax,
+                        c_u_jax,
+                        repeat=args.repeat,
+                    )
+                except Exception as exc:
+                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                    continue
+                _, _, pri_res, dua_res, duality_gap, iter_ext, iter_inner, _ = jax.device_get(out)
+                row = BatchResult(
+                    solver="jaxproxqp",
+                    mode="solve",
+                    dtype=dtype.name,
+                    batch_size=batch,
+                    horizon=args.horizon,
+                    n=qp.n,
+                    m=problem.l.size,
+                    n_eq=qp.n_eq,
+                    n_ineq=qp.n_ineq,
+                    max_iter=args.max_iter,
+                    max_iter_in=args.max_iter_in,
+                    solver_tol=args.solver_tol,
+                    regularization=args.regularization,
+                    elapsed_s=elapsed,
+                    mean_outer_iterations=float(np.mean(iter_ext)),
+                    max_outer_iterations=int(np.max(iter_ext)),
+                    mean_inner_iterations=float(np.mean(iter_inner)),
+                    max_inner_iterations=int(np.max(iter_inner)),
+                    max_primal_residual=float(np.max(pri_res)),
+                    max_dual_residual=float(np.max(dua_res)),
+                    max_duality_gap=float(np.max(duality_gap)),
+                    max_abs_x_vs_cpu=max_x,
+                    max_abs_obj_vs_cpu=max_obj,
+                    cpu_throughput=cpu_throughput,
+                )
+                rows.append(row)
+                print(
+                    f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s "
+                    f"outer_mean={row.mean_outer_iterations:.1f} inner_mean={row.mean_inner_iterations:.1f} "
+                    f"pri={row.max_primal_residual:.2e} dua={row.max_dual_residual:.2e}"
+                )
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

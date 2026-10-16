@@ -1,0 +1,6 @@
+{
+  "config": {
+    "horizon": 24
+  },
+  "mesh": true
+}

@@ -116,6 +116,10 @@ def _plot_summary(path: pathlib.Path, rows: list[dict[str, object]]) -> None:
     plt.close(fig)
 
 
+from benchmarks.vram_cases import record_vram_case
+
+
+@record_vram_case
 def run_batch(args: argparse.Namespace, *, batch_size: int, dtype: str) -> dict[str, object]:
     prefix = f"cartpole_quadratic_mpc_turbompc_autodiff_{dtype}_batch_{batch_size}"
     plot_path = args.output_dir / f"{prefix}_states.png"

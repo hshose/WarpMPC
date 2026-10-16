@@ -56,6 +56,7 @@ CHECKS = (
         required=True,
     ),
     Check("examples:matplotlib", ("matplotlib",), required=True),
+    Check("benchmarks:NVML", ("pynvml",), note="External VRAM sampling (nvidia-ml-py)."),
     Check("benchmarks:osqp", ("osqp",), note="Linear MPC CPU references."),
     Check("benchmarks:jaxadi", ("jaxadi",), note="numpysadi comparison."),
     Check("benchmarks:jaxopt", ("jaxopt",), note="BoxOSQP and CG baselines."),

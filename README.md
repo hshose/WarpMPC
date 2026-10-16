@@ -19,7 +19,7 @@ If you find WarpMPC useful, consider citing it:
 ```bibtex
 @article{hose2026warpmpc,
   title={{WarpMPC}: Large-Batch {MPC} on {GPU} via {ADMM} with Unrolled {$LDL^\top$} Factorization},
-  author={Hose, Henrik and Jeon, Se Hwan and Khazoom, Charles and Kim, Sangbae and Trimpe, Sebstian},
+  author={Hose, Henrik and Jeon, Se Hwan and Khazoom, Charles and Kim, Sangbae and Trimpe, Sebastian},
   journal={arXiv preprint arxiv:2607.11603},
   year={2026}
 }
@@ -44,8 +44,10 @@ If you find WarpMPC useful, consider citing it:
 python -m pip install -e .
 ```
 
-The default install contains the core library and example dependencies.
-For the benchmarks, see `benchmarks/README.md`.
+The default install contains the core library and minimal-example dependencies.
+The juggling example has separate `requirements.txt` files in their example
+directories; use a dedicated environment for each example. For the benchmarks,
+see [the benchmark guide](benchmarks/README.md).
 
 The library has been tested with Python `3.13` and `3.14`, CUDA `12.6` and `13.3`, JAX `0.10.0`.
 
@@ -73,25 +75,37 @@ solver = compile_sparse_mpc_sqp(
 )
 ```
 
-Minimal  runnable examples that will run on laptop-grade hardware are in [examples/](./examples/), especially
+Minimal runnable examples that will run on laptop-grade hardware are in [examples/](./examples/), especially
 [examples/jax_sqp_minimal.py](./examples/jax_sqp_minimal.py), [examples/jax_sqp_stagewise_minimal.py](./examples/jax_sqp_stagewise_minimal.py), and
 [examples/jax_ampc_minimal.py](./examples/jax_ampc_minimal.py).
 If your platform does not have CUDA or GPU support, you can run the examples with a jax backend by setting the `--qdldl-backend="jax"` flag.
 
-There are also more involved examples [quadrotor AMPC synthesis](./examples/crazyflie_ampc/), [cartpole cost function tuning](./examples/cartpole_tuning/), and [humanoid whole-body MPC](./examples/humanoid/) that will require larger desktop or server GPUs.
+Larger examples for desktop or server GPUs include:
+
+- [Quadrotor AMPC synthesis](examples/crazyflie_ampc/).
+- [Franka juggling AMPC](examples/juggling_ampc/): full-dynamics MPC data
+  collection, neural-policy training, Eigen export, and policy evaluation.
+- [Cartpole cost function tuning](examples/cartpole_tuning/).
+- [Humanoid whole-body MPC](examples/humanoid/).
 
 ## Examples and Benchmarks from the Paper
 
 You can use the following entrypoints for these examples and for running the benchmarks from the paper.
-The Slurm scripts can also be called directly with `bash`; in that mode the
-`#SBATCH` lines are treated as comments.
+The benchmark and quadrotor/cartpole scripts can also be called directly with
+`bash`; in that mode the `#SBATCH` lines are treated as comments. The staged
+juggling launchers require a Slurm allocation; see their guides.
 ```bash
-# If you installed dependencies into a virtual environement
+# If you installed dependencies into a virtual environment
 export VENV=/path/to/venv
 
 # Big H100 examples, native execution
 bash examples/crazyflie_ampc/run_h100_ampc_one_iteration.sh
 bash examples/cartpole_tuning/run_h100_cartpole_physical_quadratic_tuning.sh
+
+# Franka juggling AMPC, prepare a portable H100 submission
+python examples/juggling_ampc/submit_h100_ampc.py \
+  --dependencies /path/to/dependencies --account <your-slurm-account> \
+  --partition <your-gpu-partition> --prepare-only
 
 # Humanoid whole-body MPC, native Python execution
 "${VENV}/bin/python" examples/humanoid/run_headless_batch.py --output results/humanoid/headless_humanoid_10k.npz

@@ -1,0 +1,65 @@
+{
+  "config": {
+    "horizon": 24,
+    "restitution": 0.54,
+    "drag": 0.34,
+    "energy_weight": 24.0,
+    "comp_weight": 400.0,
+    "velocity_margin": 0.9,
+    "actuator_margin": 0.75,
+    "mass": 0.0039,
+    "pose_weight": 4.0,
+    "velocity_weight": 1.5,
+    "accel_weight": 0.8,
+    "rate_weight": 0.4,
+    "posture_weight": 0.6,
+    "warmstart_feedback_time": 0.2
+  },
+  "mesh": true,
+  "prefix": 5,
+  "drop": [
+    "workspace",
+    "tilt",
+    "upward",
+    "paddle_velocity",
+    "jerk"
+  ],
+  "dedup": true,
+  "assembly": {
+    "mass_kg": 0.48,
+    "com_m": [
+      0.0528,
+      0.0002,
+      0.0336
+    ],
+    "inertia_com_kg_m2": [
+      [
+        0.000416,
+        -1.67e-05,
+        -0.000162
+      ],
+      [
+        -1.67e-05,
+        0.00288,
+        -9e-07
+      ],
+      [
+        -0.000162,
+        -9e-07,
+        0.003058
+      ]
+    ],
+    "frame": "CAD reference axes before the mounting rotation; COM in metres, inertia about COM.",
+    "assembly": "Adapter, paddle, fasteners and four markers; configure once as end effector, additional load zero",
+    "provenance": "User-provided CAD agent handoff, 2026-09-30. Referenced redesign/02_one_piece_socket/exports/mass_properties.json was not provided locally.",
+    "assumptions": "180 g paddle and solid plastic at 1.27 g/cm^3; estimate, not measured assembly properties"
+  },
+  "geometry": {
+    "assembly_yaw_deg": -90.0,
+    "paddle_surface_offset": 0.0045
+  },
+  "mounting_observation": "User reports 90 degrees left (counterclockwise viewed from above) relative to CAD render. At HOME flange +Z points downward, giving -90 degrees about flange +Z.",
+  "identification": "Effective e=0.54 and provisional linear drag 0.34/s from first physical impact 2026-10-02. Ball mass 3.9 g measured on a scale and reported by user 2026-10-05. Exploratory two-recording fit is in runs/20261005_joint_fit; e/drag retained pending contact geometry/timing assessment.",
+  "runtime_cost_scaling": true,
+  "runtime_motion_cost_scaling": true
+}

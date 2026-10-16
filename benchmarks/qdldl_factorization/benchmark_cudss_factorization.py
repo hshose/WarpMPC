@@ -30,6 +30,10 @@ from warpmpc.jax_qdldl import (
 )
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class CpuQdldlTiming:
     factor_s_per_system: float
@@ -544,129 +548,130 @@ def main() -> None:
             f"batches={','.join(str(batch) for batch in batches)}"
         )
         for batch in batches:
-            estimate = _estimate_operand_gib(batch, plan.n, lower_pattern.nnz, dtype)
-            if max_device_gib > 0.0 and estimate > max_device_gib:
-                print(f"  batch={batch}: skipped estimated operands {estimate:.2f} GiB")
-                break
+            with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype)):
+                estimate = _estimate_operand_gib(batch, plan.n, lower_pattern.nnz, dtype)
+                if max_device_gib > 0.0 and estimate > max_device_gib:
+                    print(f"  batch={batch}: skipped estimated operands {estimate:.2f} GiB")
+                    break
 
-            try:
-                sources: list[CudssSource] = []
-                for set_id in range(2):
-                    values = sample_kkt_values(
-                        kkt,
-                        batch_size=batch,
-                        seed=args.seed + batch + 10000 * set_id,
-                        variation=args.variation,
-                        dtype=dtype,
+                try:
+                    sources: list[CudssSource] = []
+                    for set_id in range(2):
+                        values = sample_kkt_values(
+                            kkt,
+                            batch_size=batch,
+                            seed=args.seed + batch + 10000 * set_id,
+                            variation=args.variation,
+                            dtype=dtype,
+                        )
+                        rhs = np.random.default_rng(
+                            args.seed + 1000 + batch + 10000 * set_id
+                        ).standard_normal((batch, plan.n)).astype(dtype)
+                        sources.append(_make_source(cp, value_map, values, rhs))
+                    indices_gpu = cp.asarray(
+                        lower_pattern.indices.astype(np.int32, copy=False)
                     )
-                    rhs = np.random.default_rng(
-                        args.seed + 1000 + batch + 10000 * set_id
-                    ).standard_normal((batch, plan.n)).astype(dtype)
-                    sources.append(_make_source(cp, value_map, values, rhs))
-                indices_gpu = cp.asarray(
-                    lower_pattern.indices.astype(np.int32, copy=False)
-                )
-                indptr_gpu = cp.asarray(
-                    lower_pattern.indptr.astype(np.int32, copy=False)
-                )
-                operands = _make_operands_from_source(
-                    cp,
-                    cupy_sp,
-                    lower_pattern,
-                    indices_gpu,
-                    indptr_gpu,
-                    sources[0],
-                )
+                    indptr_gpu = cp.asarray(
+                        lower_pattern.indptr.astype(np.int32, copy=False)
+                    )
+                    operands = _make_operands_from_source(
+                        cp,
+                        cupy_sp,
+                        lower_pattern,
+                        indices_gpu,
+                        indptr_gpu,
+                        sources[0],
+                    )
 
-                check_values = None
-                check_rhs = None
-                max_abs_x = None
-                max_rel_residual = None
-                if not args.no_check:
-                    check_values = sample_kkt_values(
-                        kkt,
-                        batch_size=args.check_samples,
-                        seed=args.seed + 10,
-                        variation=args.variation,
-                        dtype=dtype,
-                    )
-                    check_rhs = np.random.default_rng(args.seed + 11).standard_normal(
-                        (args.check_samples, plan.n)
-                    ).astype(dtype)
-                    check_operands = _make_operands(
-                        cp, cupy_sp, lower_pattern, value_map, check_values, check_rhs
-                    )
+                    check_values = None
+                    check_rhs = None
+                    max_abs_x = None
+                    max_rel_residual = None
+                    if not args.no_check:
+                        check_values = sample_kkt_values(
+                            kkt,
+                            batch_size=args.check_samples,
+                            seed=args.seed + 10,
+                            variation=args.variation,
+                            dtype=dtype,
+                        )
+                        check_rhs = np.random.default_rng(args.seed + 11).standard_normal(
+                            (args.check_samples, plan.n)
+                        ).astype(dtype)
+                        check_operands = _make_operands(
+                            cp, cupy_sp, lower_pattern, value_map, check_values, check_rhs
+                        )
+                        with DirectSolver(
+                            check_operands.a_batch,
+                            check_operands.b_batch,
+                            options=options,
+                            execution="cuda",
+                        ) as check_solver:
+                            check_solver.plan()
+                            check_solver.factorize()
+                            check_x = check_solver.solve()
+                            _sync(cp)
+                        max_abs_x, max_rel_residual = _check_solution(
+                            plan, check_values, check_rhs, check_x
+                        )
+                        print(
+                            "  check:",
+                            f"max_abs_x={max_abs_x:.3e}",
+                            f"max_rel_residual={max_rel_residual:.3e}",
+                        )
+                        del check_operands, check_x
+
                     with DirectSolver(
-                        check_operands.a_batch,
-                        check_operands.b_batch,
+                        operands.a_batch,
+                        operands.b_batch,
                         options=options,
                         execution="cuda",
-                    ) as check_solver:
-                        check_solver.plan()
-                        check_solver.factorize()
-                        check_x = check_solver.solve()
+                    ) as solver:
+                        start = time.perf_counter()
+                        solver.plan()
                         _sync(cp)
-                    max_abs_x, max_rel_residual = _check_solution(
-                        plan, check_values, check_rhs, check_x
+                        plan_s = time.perf_counter() - start
+
+                        # Untimed warmup: factor and solve once before any timing.
+                        solver.factorize()
+                        warm_x = solver.solve()
+                        _sync(cp)
+                        del warm_x
+
+                        factor_s = _time_factor(cp, solver, operands, sources, args.repeat)
+                        solve_s = _time_solve(cp, solver, operands, sources, args.repeat)
+                        factor_solve_s, _ = _time_factor_solve(
+                            cp, solver, operands, sources, args.repeat
+                        )
+
+                    row = CudssResult(
+                        dtype=dtype.name,
+                        batch_size=batch,
+                        matrix_nnz=lower_pattern.nnz,
+                        estimated_operand_gib=estimate,
+                        plan_s=plan_s,
+                        factor_s=factor_s,
+                        solve_s=solve_s,
+                        factor_solve_s=factor_solve_s,
+                        max_abs_x=max_abs_x,
+                        max_rel_residual=max_rel_residual,
+                        cpu_timing=cpu_timing,
                     )
+                    rows.append(row)
                     print(
-                        "  check:",
-                        f"max_abs_x={max_abs_x:.3e}",
-                        f"max_rel_residual={max_rel_residual:.3e}",
+                        f"  batch={batch}: plan={plan_s:.3f}s "
+                        f"factor={factor_s:.6f}s solve={solve_s:.6f}s "
+                        f"total={factor_solve_s:.6f}s throughput={row.systems_per_s:.2f}/s"
                     )
-                    del check_operands, check_x
-
-                with DirectSolver(
-                    operands.a_batch,
-                    operands.b_batch,
-                    options=options,
-                    execution="cuda",
-                ) as solver:
-                    start = time.perf_counter()
-                    solver.plan()
-                    _sync(cp)
-                    plan_s = time.perf_counter() - start
-
-                    # Untimed warmup: factor and solve once before any timing.
-                    solver.factorize()
-                    warm_x = solver.solve()
-                    _sync(cp)
-                    del warm_x
-
-                    factor_s = _time_factor(cp, solver, operands, sources, args.repeat)
-                    solve_s = _time_solve(cp, solver, operands, sources, args.repeat)
-                    factor_solve_s, _ = _time_factor_solve(
-                        cp, solver, operands, sources, args.repeat
-                    )
-
-                row = CudssResult(
-                    dtype=dtype.name,
-                    batch_size=batch,
-                    matrix_nnz=lower_pattern.nnz,
-                    estimated_operand_gib=estimate,
-                    plan_s=plan_s,
-                    factor_s=factor_s,
-                    solve_s=solve_s,
-                    factor_solve_s=factor_solve_s,
-                    max_abs_x=max_abs_x,
-                    max_rel_residual=max_rel_residual,
-                    cpu_timing=cpu_timing,
-                )
-                rows.append(row)
-                print(
-                    f"  batch={batch}: plan={plan_s:.3f}s "
-                    f"factor={factor_s:.6f}s solve={solve_s:.6f}s "
-                    f"total={factor_solve_s:.6f}s throughput={row.systems_per_s:.2f}/s"
-                )
-            except Exception as exc:
-                print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                break
-            finally:
-                try:
-                    del operands, sources
-                except UnboundLocalError:
-                    pass
-                _free_cupy_blocks(cp)
+                except Exception as exc:
+                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                    break
+                finally:
+                    try:
+                        del operands, sources
+                    except UnboundLocalError:
+                        pass
+                    _free_cupy_blocks(cp)
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

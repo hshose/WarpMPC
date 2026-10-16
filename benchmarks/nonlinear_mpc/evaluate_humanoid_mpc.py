@@ -188,7 +188,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     if args.line_search_step_min is None:
         args.line_search_step_min = loaded_params.line_search_step_min
     if args.mpax_iteration_limit is None:
-        args.mpax_iteration_limit = args.max_iter
+        args.mpax_iteration_limit = 500
     params_obj = replace(loaded_params, n_nodes=args.horizon_nodes)
     command = BodyReferenceCommand(
         velocity_x=args.reference_velocity_x,
@@ -290,6 +290,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             pock_chambolle_alpha=args.mpax_pock_chambolle_alpha,
             regularization=args.mpax_regularization,
             unroll=args.mpax_unroll,
+            warm_start=args.mpax_warm_start,
+            warm_start_primal=args.mpax_warm_start_primal,
+            warm_start_primal_scale=args.mpax_warm_start_primal_scale,
+            primal_importance=args.mpax_primal_importance,
+            scale_invariant_initial_primal_weight=args.mpax_scale_invariant_initial_primal_weight,
         ),
         transpose_work=args.transpose_work,
         segmented=args.segmented,
@@ -543,7 +548,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "sim_steps": args.sim_steps,
         "control_dt": args.control_dt,
         "standing_reference_s": args.standing_reference_s,
-        "warm_starting": bool(settings.warm_starting),
+        "warm_starting": bool(args.mpax_warm_start if args.qp_solver == "mpax" else settings.warm_starting),
         "qp_solver": args.qp_solver,
         "mpax_iteration_limit": args.mpax_iteration_limit,
         "mpax_eps_abs": args.mpax_eps_abs,
@@ -553,6 +558,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "mpax_pock_chambolle_alpha": args.mpax_pock_chambolle_alpha,
         "mpax_regularization": args.mpax_regularization,
         "mpax_unroll": bool(args.mpax_unroll),
+        "mpax_warm_start": bool(args.mpax_warm_start),
+        "mpax_warm_start_primal": bool(args.mpax_warm_start_primal),
+        "mpax_warm_start_primal_scale": args.mpax_warm_start_primal_scale,
+        "mpax_primal_importance": args.mpax_primal_importance,
+        "mpax_scale_invariant_initial_primal_weight": bool(args.mpax_scale_invariant_initial_primal_weight),
         "qdldl_backend": args.qdldl_backend,
         "qdldl_factor_backend": args.qdldl_factor_backend,
         "qdldl_solve_backend": args.qdldl_solve_backend,
@@ -621,14 +631,19 @@ def main() -> None:
     parser.add_argument("--dtype", choices=("float32", "float64"), default="float32")
     parser.add_argument("--qp-solver", choices=("jax_osqp", "mpax"), default="jax_osqp")
     parser.add_argument("--max-iter", type=int, default=None)
-    parser.add_argument("--mpax-iteration-limit", type=int, default=None)
-    parser.add_argument("--mpax-eps-abs", type=float, default=1e-3)
-    parser.add_argument("--mpax-eps-rel", type=float, default=1e-3)
+    parser.add_argument("--mpax-iteration-limit", type=int, default=500)
+    parser.add_argument("--mpax-eps-abs", type=float, default=1e-4)
+    parser.add_argument("--mpax-eps-rel", type=float, default=1e-4)
     parser.add_argument("--mpax-termination-evaluation-frequency", type=int, default=100)
     parser.add_argument("--mpax-l-inf-ruiz-iterations", type=int, default=10)
     parser.add_argument("--mpax-pock-chambolle-alpha", type=float, default=1.0)
     parser.add_argument("--mpax-regularization", type=float, default=0.0)
     parser.add_argument("--mpax-unroll", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--mpax-warm-start", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal-scale", type=float, default=1.0)
+    parser.add_argument("--mpax-primal-importance", type=float, default=0.1)
+    parser.add_argument("--mpax-scale-invariant-initial-primal-weight", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--rho", type=float, default=None)
     parser.add_argument("--sigma", type=float, default=1e-6)
     parser.add_argument("--alpha", type=float, default=None)

@@ -142,7 +142,7 @@ def run(args: argparse.Namespace) -> dict[str, np.ndarray | float | int]:
     if args.qdldl_solve_backend is None:
         args.qdldl_solve_backend = args.qdldl_backend
     if args.mpax_iteration_limit is None:
-        args.mpax_iteration_limit = args.max_iter
+        args.mpax_iteration_limit = 500
 
     x0 = _sample_initial_states(args.batch_size, args.seed, dtype)
     z0, params0 = crazyflie_initial_guess_and_params(
@@ -194,6 +194,11 @@ def run(args: argparse.Namespace) -> dict[str, np.ndarray | float | int]:
             pock_chambolle_alpha=args.mpax_pock_chambolle_alpha,
             regularization=args.mpax_regularization,
             unroll=args.mpax_unroll,
+            warm_start=args.mpax_warm_start,
+            warm_start_primal=args.mpax_warm_start_primal,
+            warm_start_primal_scale=args.mpax_warm_start_primal_scale,
+            primal_importance=args.mpax_primal_importance,
+            scale_invariant_initial_primal_weight=args.mpax_scale_invariant_initial_primal_weight,
         ),
         transpose_work=args.transpose_work,
         segmented=args.segmented,
@@ -386,6 +391,11 @@ def run(args: argparse.Namespace) -> dict[str, np.ndarray | float | int]:
     )
     return {
         "batch_size": args.batch_size,
+        "seed": args.seed,
+        "jax_version": jax.__version__,
+        "jax_devices": [str(device) for device in jax.devices()],
+        "finite_rollout_count": int(np.sum(np.all(np.isfinite(states_arr), axis=(0, 2)))),
+        "position_rms_over_rollout": float(np.sqrt(np.mean(states_arr[:, :, :3] ** 2))),
         "horizon_steps": args.horizon_steps,
         "sim_steps": args.sim_steps,
         "control_dt": args.control_dt,
@@ -399,6 +409,11 @@ def run(args: argparse.Namespace) -> dict[str, np.ndarray | float | int]:
         "mpax_pock_chambolle_alpha": args.mpax_pock_chambolle_alpha,
         "mpax_regularization": args.mpax_regularization,
         "mpax_unroll": bool(args.mpax_unroll),
+        "mpax_warm_start": bool(args.mpax_warm_start),
+        "mpax_warm_start_primal": bool(args.mpax_warm_start_primal),
+        "mpax_warm_start_primal_scale": args.mpax_warm_start_primal_scale,
+        "mpax_primal_importance": args.mpax_primal_importance,
+        "mpax_scale_invariant_initial_primal_weight": bool(args.mpax_scale_invariant_initial_primal_weight),
         "qdldl_backend": args.qdldl_backend,
         "qdldl_factor_backend": args.qdldl_factor_backend,
         "qdldl_solve_backend": args.qdldl_solve_backend,
@@ -406,7 +421,8 @@ def run(args: argparse.Namespace) -> dict[str, np.ndarray | float | int]:
         "segmented": bool(args.segmented),
         "segment_budget": args.segment_budget,
         "segment_strategy": args.segment_strategy,
-        "warm_starting": bool(settings.warm_starting),
+        "warm_starting": bool(args.mpax_warm_start if args.qp_solver == "mpax" else settings.warm_starting),
+        "max_iter": args.max_iter,
         "group_repeated_stages": bool(args.group_repeated_stages),
         "level_scheduled_solve": bool(args.level_scheduled_solve),
         "level_scheduled_solve_threshold": args.level_scheduled_solve_threshold,
@@ -455,14 +471,19 @@ def main() -> None:
     parser.add_argument("--dtype", default="float32", choices=("float32", "float64"))
     parser.add_argument("--qp-solver", choices=("jax_osqp", "mpax"), default="jax_osqp")
     parser.add_argument("--max-iter", type=int, default=25)
-    parser.add_argument("--mpax-iteration-limit", type=int, default=None)
-    parser.add_argument("--mpax-eps-abs", type=float, default=1e-3)
-    parser.add_argument("--mpax-eps-rel", type=float, default=1e-3)
+    parser.add_argument("--mpax-iteration-limit", type=int, default=500)
+    parser.add_argument("--mpax-eps-abs", type=float, default=1e-4)
+    parser.add_argument("--mpax-eps-rel", type=float, default=1e-4)
     parser.add_argument("--mpax-termination-evaluation-frequency", type=int, default=100)
     parser.add_argument("--mpax-l-inf-ruiz-iterations", type=int, default=10)
     parser.add_argument("--mpax-pock-chambolle-alpha", type=float, default=1.0)
     parser.add_argument("--mpax-regularization", type=float, default=0.0)
     parser.add_argument("--mpax-unroll", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--mpax-warm-start", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal-scale", type=float, default=1.0)
+    parser.add_argument("--mpax-primal-importance", type=float, default=0.1)
+    parser.add_argument("--mpax-scale-invariant-initial-primal-weight", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--rho", type=float, default=0.1)
     parser.add_argument("--sigma", type=float, default=1e-6)
     parser.add_argument("--alpha", type=float, default=1.6)

@@ -431,7 +431,7 @@ def run_experiment(cf: Crazyflie, args: argparse.Namespace, recorder: SegmentRec
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--uri", default=uri_helper.uri_from_env(default="radio://0/0/2M/E7E7E7E7E7"))
-    parser.add_argument("--mocap-host", default="134.130.192.68")
+    parser.add_argument("--mocap-host", required=True, help="Motion-capture server hostname or IP address")
     parser.add_argument("--mocap-system", default="vicon")
     parser.add_argument("--rigid-body", default="cf_hsh_psd")
     parser.add_argument("--position-only", action="store_true", help="Send mocap position without attitude quaternion.")

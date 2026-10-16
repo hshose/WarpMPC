@@ -3,7 +3,6 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=24
 #SBATCH --time=24:00:00
-#SBATCH --partition=c23g
 #SBATCH --job-name=human
 #SBATCH --output=hpclogs/%A.log
 #SBATCH --error=hpclogs/%A.log

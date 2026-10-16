@@ -3,7 +3,6 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=24
 #SBATCH --time=12:00:00
-#SBATCH --partition=c23g
 #SBATCH --job-name=mpaxcrazy
 #SBATCH --output=hpclogs/%A.log
 #SBATCH --error=hpclogs/%A.log

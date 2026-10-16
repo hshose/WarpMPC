@@ -1,0 +1,79 @@
+{
+  "collect_batch_size": 60000,
+  "control_dt": 0.02,
+  "plant_dt": 0.0005,
+  "dtype": "float32",
+  "qdldl_backend": "warp",
+  "transpose_work": true,
+  "segmented": true,
+  "segment_budget": 256,
+  "segment_strategy": "optimal",
+  "level_scheduled_solve": true,
+  "level_scheduled_solve_threshold": 32,
+  "input_order": [
+    "ball_position_relative_origin:3",
+    "estimated_ball_velocity:3",
+    "joint_position:7",
+    "joint_velocity:7",
+    "estimated_ball_spin:3",
+    "inferred_torque:7",
+    "reference_face_offset:3",
+    "reference_posture:7"
+  ],
+  "output_order": "first future ramp knot: seven projected joint accelerations",
+  "validation_split": "whole trajectories",
+  "censoring": "irreversible after first ball-loss event",
+  "mpc_timing": "synchronous paused-time batched solve; immediate plan application",
+  "simulate_mpc_computation_delay": false,
+  "simulate_plan_delivery_delay": false,
+  "simulate_sensor_timing_noise": true,
+  "simulate_robot_servo_delay": true,
+  "policy_hidden_layers": [
+    256,
+    256,
+    256
+  ],
+  "policy_activation": "tanh",
+  "policy_output_activation": "linear",
+  "kkt_refinement_steps": 0,
+  "kkt_residual_arithmetic": "compensated float32 if optional refinement is enabled",
+  "factor_transpose": true,
+  "factor_stage_batch_limit": 20,
+  "qp_coordinates": "increments after native absolute-problem Ruiz scaling",
+  "qp_products": "compensated float32",
+  "default_protocol": "arm_only_inflation",
+  "collection_rollout_seconds": [
+    5
+  ],
+  "validation_rollout_seconds": 30,
+  "collection_multipliers": {
+    "ball_flight": 1.0,
+    "ball_contact": 1.0,
+    "sensing": 1.0,
+    "plan_delivery": 1.0,
+    "arm_following": 1.5
+  },
+  "validation_multipliers": {
+    "ball_flight": 1.0,
+    "ball_contact": 1.0,
+    "sensing": 1.0,
+    "plan_delivery": 1.0,
+    "arm_following": 1.0
+  },
+  "dataset_storage": "preallocated GPU per-trajectory reservoir",
+  "dataset_gib": 3.0,
+  "collection_entrypoint": "fast_rollout.py",
+  "collection_observer": false,
+  "observation_noise": "empirical position and clock/delivery residuals added to simulator truth",
+  "factor_stage_streaming_min_batch": 8192,
+  "qdldl_store_diagonal": false,
+  "source_audit": false,
+  "projection_filter": "unclipped acceleration of applied first future knot",
+  "available_collection_rollout_seconds": [
+    5,
+    10,
+    20
+  ],
+  "optimization_evaluation_default": false,
+  "results_directory": "results/juggling_ampc/<timestamp>"
+}

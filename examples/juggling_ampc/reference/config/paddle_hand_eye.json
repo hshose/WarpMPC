@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-01T14:33:59.683053+00:00",
+  "convention": "A_T_B maps B coordinates into A; metres; right-handed",
+  "flange_frame": "panda_link8",
+  "paddle_subject": "hsh_pingpong_paddle",
+  "F_T_P": [
+    [
+      -0.024455117392884064,
+      -0.9996899362296622,
+      0.004688137629597393,
+      -0.017143847101630826
+    ],
+    [
+      -0.9996503359008247,
+      0.024500789998689675,
+      0.009945713790782499,
+      -0.153713898458078
+    ],
+    [
+      -0.01005749306081355,
+      -0.004443274757866718,
+      -0.9999395502442924,
+      0.03615951726038673
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "calibration_V_T_B": [
+    [
+      -0.026988162286794903,
+      0.9996282968352769,
+      -0.003860992435329027,
+      2.0971463456493056
+    ],
+    [
+      -0.9995206717627853,
+      -0.02704345994724111,
+      -0.015069107238084588,
+      1.1641220235018226
+    ],
+    [
+      -0.015167920597516059,
+      0.0034524542409725576,
+      0.9998790000517371,
+      0.8435504182592194
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "world_alignment_is_session_specific": true,
+  "samples": 16,
+  "translation_rms_m": 0.00018423715963591307,
+  "rotation_rms_deg": 0.10762185473537371,
+  "max_translation_m": 0.00032873084444546283,
+  "holdout_max_translation_m": 0.00022624964324418598,
+  "holdout_max_rotation_deg": 0.1191608870631826,
+  "rotation_excitation_singular_values": [
+    1.709737818404366,
+    1.5115518979842602,
+    1.247422580479255
+  ],
+  "jacobian_condition": 71.86829332863424,
+  "paddle_segment": "hsh_pingpong_paddle",
+  "source_kind": "live_vicon_robot",
+  "P_T_CAD_face": [
+    [
+      0.9996503359008247,
+      0.02445511739288425,
+      0.010057493060813553,
+      0.00587128181472274
+    ],
+    [
+      -0.02450078999868976,
+      0.9996899362296621,
+      0.00444327475786684,
+      -0.017289615453153995
+    ],
+    [
+      -0.009945713790782497,
+      -0.004688137629597516,
+      0.9999395502442924,
+      0.0006773303406468756
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "cad_geometry_spec": {
+    "config": {
+      "horizon": 24
+    },
+    "mesh": true,
+    "prefix": 5,
+    "drop": [
+      "workspace",
+      "tilt",
+      "upward",
+      "paddle_velocity",
+      "jerk"
+    ],
+    "dedup": true,
+    "assembly": {
+      "mass_kg": 0.48,
+      "com_m": [
+        0.0528,
+        0.0002,
+        0.0336
+      ],
+      "inertia_com_kg_m2": [
+        [
+          0.000416,
+          -1.67e-05,
+          -0.000162
+        ],
+        [
+          -1.67e-05,
+          0.00288,
+          -9e-07
+        ],
+        [
+          -0.000162,
+          -9e-07,
+          0.003058
+        ]
+      ],
+      "frame": "CAD reference axes before the mounting rotation; COM in metres, inertia about COM.",
+      "assembly": "Adapter, paddle, fasteners and four markers; configure once as end effector, additional load zero",
+      "provenance": "User-provided CAD agent handoff, 2026-09-30. Referenced redesign/02_one_piece_socket/exports/mass_properties.json was not provided locally.",
+      "assumptions": "180 g paddle and solid plastic at 1.27 g/cm^3; estimate, not measured assembly properties"
+    },
+    "geometry": {
+      "assembly_yaw_deg": -90.0,
+      "paddle_surface_offset": 0.0045
+    },
+    "mounting_observation": "User reports 90 degrees left (counterclockwise viewed from above) relative to CAD render. At HOME flange +Z points downward, giving -90 degrees about flange +Z."
+  }
+}

@@ -99,6 +99,9 @@ class CrazyflieObstacleMPXProblem:
         return self.horizon * CRAZYFLIE_NU + (self.horizon + 1) * CRAZYFLIE_CYLINDER_OBSTACLES.shape[0]
 
 
+from benchmarks.vram_cases import record_vram_case
+
+
 def _motor_matrix_np() -> tuple[np.ndarray, np.ndarray]:
     inv_arm = 1.0 / CRAZYFLIE_ARM
     inv_k = 1.0 / CRAZYFLIE_THRUST_TO_TORQUE
@@ -933,6 +936,7 @@ def _finish_run(
     return summary
 
 
+@record_vram_case
 def run(args: argparse.Namespace) -> dict[str, object]:
     dtype = np.dtype(args.dtype)
     jax.config.update("jax_enable_x64", dtype == np.dtype("float64"))

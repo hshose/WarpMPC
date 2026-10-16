@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import os
+
 import jax
 
 
-JAX_COMPILATION_CACHE_DIR = "/tmp/jax_cache"
+JAX_COMPILATION_CACHE_DIR = os.environ.get("JAX_COMPILATION_CACHE_DIR", "/tmp/jax_cache")
 JAX_XLA_CACHE_KIND = "xla_gpu_per_fusion_autotune_cache_dir"
 
 

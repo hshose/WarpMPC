@@ -420,7 +420,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     if args.qdldl_solve_backend is None:
         args.qdldl_solve_backend = args.qdldl_backend
     if args.mpax_iteration_limit is None:
-        args.mpax_iteration_limit = args.osqp_max_iter
+        args.mpax_iteration_limit = 500
     args.noise_scale = 0.0
     args.process_noise_scale = ZERO_PROCESS_NOISE_SCALE
     args.input_noise_scale = ZERO_INPUT_NOISE_SCALE
@@ -533,6 +533,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "mpax_pock_chambolle_alpha": args.mpax_pock_chambolle_alpha,
         "mpax_regularization": args.mpax_regularization,
         "mpax_unroll": bool(args.mpax_unroll),
+        "mpax_warm_start": bool(args.mpax_warm_start),
+        "mpax_warm_start_primal": bool(args.mpax_warm_start_primal),
+        "mpax_warm_start_primal_scale": args.mpax_warm_start_primal_scale,
+        "mpax_primal_importance": args.mpax_primal_importance,
+        "mpax_scale_invariant_initial_primal_weight": bool(args.mpax_scale_invariant_initial_primal_weight),
         "rho": args.rho,
         "sigma": args.sigma,
         "alpha": args.alpha,
@@ -556,7 +561,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "simulation_input_disturbance_bound": 0.0,
         "simulation_process_noise_scale_effective": 0.0,
         "simulation_input_noise_scale_effective": 0.0,
-        "warm_starting": True,
+        "warm_starting": bool(args.mpax_warm_start if args.qp_solver == "mpax" else True),
         "group_repeated_stages": bool(args.group_repeated_stages),
         "level_scheduled_solve": bool(args.level_scheduled_solve),
         "level_scheduled_solve_threshold": args.level_scheduled_solve_threshold,
@@ -607,14 +612,19 @@ def main() -> None:
     parser.add_argument("--qp-solver", choices=("jax_osqp", "mpax"), default="jax_osqp")
     parser.add_argument("--dtype", choices=("float32", "float64"), default="float32")
     parser.add_argument("--osqp-max-iter", "--max-iter", dest="osqp_max_iter", type=int, default=25)
-    parser.add_argument("--mpax-iteration-limit", type=int, default=None)
-    parser.add_argument("--mpax-eps-abs", type=float, default=1e-3)
-    parser.add_argument("--mpax-eps-rel", type=float, default=1e-3)
+    parser.add_argument("--mpax-iteration-limit", type=int, default=500)
+    parser.add_argument("--mpax-eps-abs", type=float, default=1e-4)
+    parser.add_argument("--mpax-eps-rel", type=float, default=1e-4)
     parser.add_argument("--mpax-termination-evaluation-frequency", type=int, default=100)
     parser.add_argument("--mpax-l-inf-ruiz-iterations", type=int, default=10)
     parser.add_argument("--mpax-pock-chambolle-alpha", type=float, default=1.0)
     parser.add_argument("--mpax-regularization", type=float, default=0.0)
     parser.add_argument("--mpax-unroll", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--mpax-warm-start", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--mpax-warm-start-primal-scale", type=float, default=1.0)
+    parser.add_argument("--mpax-primal-importance", type=float, default=0.1)
+    parser.add_argument("--mpax-scale-invariant-initial-primal-weight", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--rho", type=float, default=0.1)
     parser.add_argument("--sigma", type=float, default=1e-6)
     parser.add_argument("--alpha", type=float, default=1.6)
@@ -661,7 +671,7 @@ def main() -> None:
     if args.sqp_iterations <= 0:
         raise ValueError("sqp iterations must be positive")
     if args.mpax_iteration_limit is None:
-        args.mpax_iteration_limit = args.osqp_max_iter
+        args.mpax_iteration_limit = 500
 
     summary = run(args)
     if not args.skip_state_plot:

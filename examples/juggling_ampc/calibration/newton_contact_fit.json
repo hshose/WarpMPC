@@ -1,0 +1,2811 @@
+{
+  "stiffness": 500000.0,
+  "dt": 0.0005,
+  "rows": [
+    {
+      "radius_m": 0.0,
+      "target_restitution": 0.5568564815669839,
+      "damping": 289.8067788970536,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5389546751976013,
+          "maximum_penetration_m": 0.0021218936890363693,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0779093503952026
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6820906496047974,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.290472149848938
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5542111992835999,
+          "maximum_penetration_m": 0.0021691620349884033,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.1084223985671997
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6515776014328003,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30715006589889526
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5494460463523865,
+          "maximum_penetration_m": 0.0031600594520568848,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6483380794525146
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.9916619205474855,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30189090967178345
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5366276502609253,
+          "maximum_penetration_m": 0.003075558692216873,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6098829507827759
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0301170492172242,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2879692316055298
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5527812242507935,
+          "maximum_penetration_m": 0.004198659211397171,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.211124897003174
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3088751029968262,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30556708574295044
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.565141499042511,
+          "maximum_penetration_m": 0.004290344193577766,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.260565996170044
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.259434003829956,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.319384902715683
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5590740442276001,
+          "maximum_penetration_m": 0.0052896831184625626,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.795370101928711
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6046298980712894,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.31256377696990967
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.8067788970536,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.546495795249939,
+          "maximum_penetration_m": 0.00516055803745985,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.7324790954589844
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.667520904541016,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.29865768551826477
+        }
+      ]
+    },
+    {
+      "radius_m": 0.0096875,
+      "target_restitution": 0.556806820319856,
+      "damping": 289.85546586395435,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5389050245285034,
+          "maximum_penetration_m": 0.002121802419424057,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0778100490570068
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6821899509429932,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2904186248779297
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5541608929634094,
+          "maximum_penetration_m": 0.0021690670400857925,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.1083217859268188
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6516782140731812,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3070943057537079
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5493966341018677,
+          "maximum_penetration_m": 0.0031599141657352448,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.648189902305603
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.9918100976943971,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30183660984039307
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5365787148475647,
+          "maximum_penetration_m": 0.003075418993830681,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6097360849380493
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0302639150619508,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2879166603088379
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5527319312095642,
+          "maximum_penetration_m": 0.004198480397462845,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.210927724838257
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3090722751617432,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30551257729530334
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5650916695594788,
+          "maximum_penetration_m": 0.0042901597917079926,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.260366678237915
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.259633321762085,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3193286061286926
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5590245723724365,
+          "maximum_penetration_m": 0.005289445631206036,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.7951228618621826
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6048771381378177,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3125084638595581
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 289.85546586395435,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5464468598365784,
+          "maximum_penetration_m": 0.00516032800078392,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.732234239578247
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6677657604217533,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.29860416054725647
+        }
+      ]
+    },
+    {
+      "radius_m": 0.019375,
+      "target_restitution": 0.5560619016129371,
+      "damping": 290.58636154111235,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.538159191608429,
+          "maximum_penetration_m": 0.0021204445511102676,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.076318383216858
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6836816167831421,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.28961530327796936
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5534064173698425,
+          "maximum_penetration_m": 0.00216766819357872,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.106812834739685
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.653187165260315,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3062586486339569
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5486555099487305,
+          "maximum_penetration_m": 0.0031577367335557938,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6459665298461914
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.9940334701538087,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30102285742759705
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5358442664146423,
+          "maximum_penetration_m": 0.0030733197927474976,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6075327396392822
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.032467260360718,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2871290445327759
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5519924759864807,
+          "maximum_penetration_m": 0.004195773974061012,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.207969903945923
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3120300960540772,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3046956956386566
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5643444061279297,
+          "maximum_penetration_m": 0.004287367686629295,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.2573776245117188
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.2626223754882813,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3184846043586731
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5582829713821411,
+          "maximum_penetration_m": 0.005285877734422684,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.791414737701416
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6085852622985843,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3116798400878906
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 290.58636154111235,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5457121133804321,
+          "maximum_penetration_m": 0.005156881175935268,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.728560447692871
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6714395523071293,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.297801673412323
+        }
+      ]
+    },
+    {
+      "radius_m": 0.029062499999999998,
+      "target_restitution": 0.552833920549622,
+      "damping": 293.76551624987184,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5349271893501282,
+          "maximum_penetration_m": 0.0021145548671483994,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0698543787002563
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6901456212997437,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2861470878124237
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5501372218132019,
+          "maximum_penetration_m": 0.002161594107747078,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.1002744436264038
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6597255563735962,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.30265095829963684
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5438089966773987,
+          "maximum_penetration_m": 0.0031482912600040436,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6314269304275513
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0085730695724489,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2957281768321991
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5326613187789917,
+          "maximum_penetration_m": 0.003064211457967758,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.597983956336975
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.042016043663025,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2837280333042145
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5487880706787109,
+          "maximum_penetration_m": 0.004184039309620857,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.1951522827148438
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3248477172851563,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3011683523654938
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5611063838005066,
+          "maximum_penetration_m": 0.004275258630514145,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.2444255352020264
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.2755744647979737,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3148403763771057
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5550691485404968,
+          "maximum_penetration_m": 0.0052703991532325745,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.775345802307129
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6246541976928714,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3081017732620239
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 293.76551624987184,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5425277948379517,
+          "maximum_penetration_m": 0.005141923204064369,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.712639093399048
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6873609066009525,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2943364381790161
+        }
+      ]
+    },
+    {
+      "radius_m": 0.03875,
+      "target_restitution": 0.5441432023022352,
+      "damping": 302.4216065501704,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5262265801429749,
+          "maximum_penetration_m": 0.0020986348390579224,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0524531602859497
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.7075468397140503,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.27691441774368286
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5413377285003662,
+          "maximum_penetration_m": 0.00214519165456295,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0826754570007324
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.6773245429992676,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2930465340614319
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5351632833480835,
+          "maximum_penetration_m": 0.003122778609395027,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.6054898500442505
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0345101499557496,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2863997220993042
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5240912437438965,
+          "maximum_penetration_m": 0.0030395910143852234,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.5722737312316895
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0677262687683107,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.27467161417007446
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5401615500450134,
+          "maximum_penetration_m": 0.004152318462729454,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.1606462001800537
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3593537998199463,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2917745113372803
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5523906350135803,
+          "maximum_penetration_m": 0.0042425524443387985,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.2095625400543213
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3104374599456787,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.3051353991031647
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5464179515838623,
+          "maximum_penetration_m": 0.005228593945503235,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.7320897579193115
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6679102420806888,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2985725700855255
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 302.4216065501704,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5339545011520386,
+          "maximum_penetration_m": 0.005101494491100311,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.6697726249694824
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.730227375030518,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.28510743379592896
+        }
+      ]
+    },
+    {
+      "radius_m": 0.0484375,
+      "target_restitution": 0.525818202112031,
+      "damping": 320.39814133993275,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5086144208908081,
+          "maximum_penetration_m": 0.0020661167800426483,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0172288417816162
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.7427711582183838,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.25868862867355347
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5210795402526855,
+          "maximum_penetration_m": 0.002111745998263359,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.042159080505371
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.7178409194946289,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2715238928794861
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5176621079444885,
+          "maximum_penetration_m": 0.003070743754506111,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.5529862642288208
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0870137357711793,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.26797401905059814
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5051018595695496,
+          "maximum_penetration_m": 0.002989295870065689,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.5153056383132935
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.1246943616867067,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2551279067993164
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5214723944664001,
+          "maximum_penetration_m": 0.004087530076503754,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.0858895778656006
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.4341104221343994,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2719334661960602
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5347535610198975,
+          "maximum_penetration_m": 0.004175862297415733,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.13901424407959
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3809857559204102,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2859613597393036
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5289077162742615,
+          "maximum_penetration_m": 0.005143335089087486,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.644538640975952
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.7554613590240482,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.27974337339401245
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 320.39814133993275,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5165959596633911,
+          "maximum_penetration_m": 0.005018910393118858,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.582979679107666
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.8170203208923343,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2668713629245758
+        }
+      ]
+    },
+    {
+      "radius_m": 0.058124999999999996,
+      "target_restitution": 0.49249550528919367,
+      "damping": 357.6545005806781,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4723227322101593,
+          "maximum_penetration_m": 0.0020009949803352356,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.9446454644203186
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.8153545355796814,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.22308875620365143
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4883793294429779,
+          "maximum_penetration_m": 0.0020449943840503693,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.9767586588859558
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.7832413411140442,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.23851436376571655
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.48327723145484924,
+          "maximum_penetration_m": 0.0029668472707271576,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.4498317241668701
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.19016827583313,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2335568517446518
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4709815979003906,
+          "maximum_penetration_m": 0.002888539806008339,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.4129447937011719
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.2270552062988282,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.22182364761829376
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.48793506622314453,
+          "maximum_penetration_m": 0.003957776352763176,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.9517402648925781
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.568259735107422,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.23808063566684723
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.5022293329238892,
+          "maximum_penetration_m": 0.00404275581240654,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.0089173316955566
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.5110826683044434,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2522343099117279
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.49353280663490295,
+          "maximum_penetration_m": 0.004973125644028187,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.4676640033721924
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.932335996627808,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2435746192932129
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 357.6545005806781,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4824756681919098,
+          "maximum_penetration_m": 0.004853485152125359,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.4123783111572266
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.9876216888427738,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.2327827513217926
+        }
+      ]
+    },
+    {
+      "radius_m": 0.0678125,
+      "target_restitution": 0.4376198272128371,
+      "damping": 427.8696854878402,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4119633734226227,
+          "maximum_penetration_m": 0.0018861107528209686,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.8239267468452454
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.9360732531547546,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.1697138249874115
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4309100806713104,
+          "maximum_penetration_m": 0.001932930201292038,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.8618201613426208
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 0.8981798386573792,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.1856835037469864
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.42568841576576233,
+          "maximum_penetration_m": 0.0027845893055200577,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.2770652770996094
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.3629347229003907,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.18121062219142914
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4123048484325409,
+          "maximum_penetration_m": 0.0027106739580631256,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.2369145154953003
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.4030854845046998,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.1699952632188797
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.43175944685935974,
+          "maximum_penetration_m": 0.0037288572639226913,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.727037787437439
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.792962212562561,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.18641622364521027
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4490334391593933,
+          "maximum_penetration_m": 0.0038094520568847656,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.7961337566375732
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.7238662433624268,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.20163102447986603
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.4403229355812073,
+          "maximum_penetration_m": 0.004674630239605904,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.2016146183013916
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 2.1983853816986088,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.19388428330421448
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 427.8696854878402,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.42581239342689514,
+          "maximum_penetration_m": 0.004561522044241428,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            2.1290619373321533
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 2.270938062667847,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.18131619691848755
+        }
+      ]
+    },
+    {
+      "radius_m": 0.0775,
+      "target_restitution": 0.35344401333100495,
+      "damping": 555.8039349288568,
+      "validation": [
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.32133421301841736,
+          "maximum_penetration_m": 0.0017003882676362991,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.6426684260368347
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.1173315739631653,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.10325567424297333
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 2.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.3452075719833374,
+          "maximum_penetration_m": 0.0017797686159610748,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.6904151439666748
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            1.76,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.0695848560333252,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.11916826665401459
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.34336134791374207,
+          "maximum_penetration_m": 0.002492869272828102,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.0300840139389038
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.6099159860610963,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.11789699643850327
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 3.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.32608887553215027,
+          "maximum_penetration_m": 0.002422783523797989,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            0.9782666563987732
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            2.64,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 1.661733343601227,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.10633395612239838
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.34824350476264954,
+          "maximum_penetration_m": 0.003358738496899605,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.3929740190505981
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 2.127025980949402,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.12127353996038437
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 4.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.36795783042907715,
+          "maximum_penetration_m": 0.003503754734992981,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.4718313217163086
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            3.52,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 2.0481686782836914,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.135392963886261
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000125,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.35989636182785034,
+          "maximum_penetration_m": 0.004225829616189003,
+          "contact_duration_s": 0.005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.7994818687438965
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 2.600518131256104,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.12952540814876556
+        },
+        {
+          "stiffness": 500000.0,
+          "damping": 555.8039349288568,
+          "speed": 5.0,
+          "tangent_m_s": 0.0,
+          "spin_rad_s": 0.0,
+          "phase_s": 0.000375,
+          "dt": 0.0005,
+          "friction": 0.3,
+          "friction_damping": 1500.0,
+          "ball_mass_kg": 0.0039,
+          "restitution": 0.34174853563308716,
+          "maximum_penetration_m": 0.004089144989848137,
+          "contact_duration_s": 0.0045000000000000005,
+          "outgoing_velocity": [
+            0.0,
+            0.0,
+            1.7087427377700806
+          ],
+          "outgoing_spin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "impulse_prediction": [
+            0.0,
+            0.0,
+            4.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "prediction_law": "MPC smooth Coulomb saturation, infinite racket mass",
+          "linear_error_m_s": 2.69125726222992,
+          "tangential_error_m_s": 0.0,
+          "spin_error_rad_s": 0.0,
+          "energy_ratio": 0.11679206788539886
+        }
+      ]
+    }
+  ],
+  "max_heldout_restitution_error": 0.03210980031258759,
+  "passed": true,
+  "rebound_velocity_rms_error_m_s": 0.038314335691097955,
+  "rebound_velocity_bias_m_s": -0.01994991017811891,
+  "qualification": "isolated native contact only; full closed loop validation pending",
+  "model_sha256": "566fe105bda1150b2d9bdb2e46b183ff94e587bd5a797b53d87c54ec5b113f0b"
+}

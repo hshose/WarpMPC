@@ -4,7 +4,6 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=24
 #SBATCH --time=24:00:00
-#SBATCH --partition=c23g
 #SBATCH --job-name=cpphysquad
 #SBATCH --output=hpclogs/%A.log
 

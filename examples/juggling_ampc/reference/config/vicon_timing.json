@@ -1,0 +1,11 @@
+{
+  "extra_latency_s": -0.002,
+  "convention": "capture = receive - SDK latency - extra_latency; negative correction advances Vicon",
+  "window_estimates_s": [
+    -0.004648,
+    -0.002079,
+    -0.001347
+  ],
+  "note": "Provisional constant-offset fit with per-axis extrinsic translation nuisance; small improvement and window dependence. Recalibrate after changing tracker/filter/network settings; no claim of absolute clock synchronization.",
+  "vicon_host": ""
+}

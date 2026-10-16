@@ -73,6 +73,9 @@ class OSQPSettings:
     check_termination: int = 0
     warm_starting: bool = False
     polishing: bool = False
+    # Vector rho only: None uses rho for free (doubly unbounded) rows.
+    # Set 1e-6 to reproduce OSQP's legacy free-row penalty.
+    rho_free: float | None = None
 
 
 class OSQPWarmStart(NamedTuple):

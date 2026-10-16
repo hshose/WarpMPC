@@ -102,3 +102,6 @@ Outputs are written below `results/crazyflie_ampc` by default:
 
 Extra example dependencies beyond the base project are listed in
 `requirements.txt`.
+
+For motion-capture hardware scripts, supply your server explicitly with
+`--mocap-host <server-hostname-or-address>`.

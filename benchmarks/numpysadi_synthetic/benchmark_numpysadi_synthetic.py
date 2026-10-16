@@ -30,6 +30,8 @@ if str(ROOT) not in sys.path:
 from warpmpc.numpysadi import generate_source, load_function, random_inputs_with_key
 
 
+from benchmarks.vram_cases import record_vram_case
+
 DEFAULT_SIZES = [100, 1_000, 10_000, 100_000, 1_000_000]
 DEFAULT_BATCH_SIZE = 10_000
 DEFAULT_COMPILE_TIMEOUT_SECONDS = 10 * 60
@@ -211,6 +213,7 @@ def run_one(
     return result
 
 
+@record_vram_case
 def run_one_with_timeout(
     provider: str,
     casadi_function: cs.Function,

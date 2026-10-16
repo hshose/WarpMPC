@@ -1,0 +1,14 @@
+{
+  "config": {
+    "horizon": 40
+  },
+  "prefix": 5,
+  "drop": [
+    "workspace",
+    "tilt",
+    "upward",
+    "paddle_velocity",
+    "jerk"
+  ],
+  "dedup": true
+}

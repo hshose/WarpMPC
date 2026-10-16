@@ -22,6 +22,10 @@ if str(ROOT) not in sys.path:
 _RUNTIME_IMPORTED = False
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class BatchResult:
     solver: str
@@ -41,6 +45,8 @@ class BatchResult:
     eps_rel: float
     l_inf_ruiz_iterations: int
     regularization: float
+    primal_importance: float
+    scale_invariant_initial_primal_weight: bool
     elapsed_s: float
     mean_iterations: float
     max_iterations: int
@@ -213,6 +219,8 @@ def _write_csv(path: pathlib.Path, rows: list[BatchResult]) -> None:
                 "eps_rel",
                 "l_inf_ruiz_iterations",
                 "regularization",
+                "primal_importance",
+                "scale_invariant_initial_primal_weight",
                 "elapsed_s",
                 "systems_per_s",
                 "mean_iterations",
@@ -244,6 +252,8 @@ def _write_csv(path: pathlib.Path, rows: list[BatchResult]) -> None:
                     "eps_rel": row.eps_rel,
                     "l_inf_ruiz_iterations": row.l_inf_ruiz_iterations,
                     "regularization": row.regularization,
+                    "primal_importance": row.primal_importance,
+                    "scale_invariant_initial_primal_weight": row.scale_invariant_initial_primal_weight,
                     "elapsed_s": row.elapsed_s,
                     "systems_per_s": row.systems_per_s,
                     "mean_iterations": row.mean_iterations,
@@ -284,6 +294,8 @@ def _read_csv(path: pathlib.Path) -> list[BatchResult]:
                 eps_rel=float(row["eps_rel"]),
                 l_inf_ruiz_iterations=int(row["l_inf_ruiz_iterations"]),
                 regularization=float(row["regularization"]),
+                primal_importance=float(row.get("primal_importance", 1.0)),
+                scale_invariant_initial_primal_weight=row.get("scale_invariant_initial_primal_weight", "true").lower() == "true",
                 elapsed_s=float(row["elapsed_s"]),
                 mean_iterations=float(row["mean_iterations"]),
                 max_iterations=int(row["max_iterations"]),
@@ -383,6 +395,8 @@ def _run_benchmark(args: argparse.Namespace) -> None:
             termination_evaluation_frequency=args.termination_evaluation_frequency,
             l_inf_ruiz_iterations=args.l_inf_ruiz_iterations,
             pock_chambolle_alpha=args.pock_chambolle_alpha,
+            primal_importance=args.primal_importance,
+            scale_invariant_initial_primal_weight=args.scale_invariant_initial_primal_weight,
             unroll=args.unroll,
         )
         solve_fn = make_batched_solve_fn(qp, solver)
@@ -416,55 +430,58 @@ def _run_benchmark(args: argparse.Namespace) -> None:
             print(f"  check max_abs_x={max_x:.3e} max_abs_obj={max_obj:.3e}")
 
         for batch in _parse_ints(args.batch_sizes):
-            estimate = _estimate_bytes(batch, qp, dtype, args.iteration_limit, unroll=args.unroll)
-            if estimate > max_bytes:
-                print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                continue
-            _, _, q, l, u = batched_problem_data(
-                problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
-            )
-            rhs = mpax_rhs(qp, l, u, dtype)
-            q_jax = jnp.asarray(q)
-            rhs_jax = jnp.asarray(rhs)
-            try:
-                compiled, _ = _compile_and_warm(solve_fn, q_jax, rhs_jax)
-                elapsed, out = _time_compiled(compiled, q_jax, rhs_jax, repeat=args.repeat)
-            except Exception as exc:
-                print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                continue
-            _, _, iterations, status = out
-            iterations_np = np.asarray(jax.device_get(iterations))
-            row = BatchResult(
-                solver="mpax",
-                mode="solve",
-                dtype=dtype.name,
-                batch_size=batch,
-                horizon=args.horizon,
-                n=qp.n,
-                m=qp.m_original,
-                n_eq=qp.n_eq,
-                n_ineq=qp.n_ineq,
-                nnz_q=qp.nnz_q,
-                nnz_a_eq=qp.nnz_a_eq,
-                nnz_g_ineq=qp.nnz_g_ineq,
-                iteration_limit=args.iteration_limit,
-                eps_abs=args.eps_abs,
-                eps_rel=args.eps_rel,
-                l_inf_ruiz_iterations=args.l_inf_ruiz_iterations,
-                regularization=args.regularization,
-                elapsed_s=elapsed,
-                mean_iterations=float(np.mean(iterations_np)),
-                max_iterations=int(np.max(iterations_np)),
-                status_values=_status_values(status),
-                max_abs_x_vs_cpu=max_x,
-                max_abs_obj_vs_cpu=max_obj,
-                cpu_throughput=cpu_throughput,
-            )
-            rows.append(row)
-            print(
-                f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s "
-                f"iters_mean={row.mean_iterations:.1f} status={row.status_values}"
-            )
+            with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype)):
+                estimate = _estimate_bytes(batch, qp, dtype, args.iteration_limit, unroll=args.unroll)
+                if estimate > max_bytes:
+                    print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                    continue
+                _, _, q, l, u = batched_problem_data(
+                    problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
+                )
+                rhs = mpax_rhs(qp, l, u, dtype)
+                q_jax = jnp.asarray(q)
+                rhs_jax = jnp.asarray(rhs)
+                try:
+                    compiled, _ = _compile_and_warm(solve_fn, q_jax, rhs_jax)
+                    elapsed, out = _time_compiled(compiled, q_jax, rhs_jax, repeat=args.repeat)
+                except Exception as exc:
+                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                    continue
+                _, _, iterations, status = out
+                iterations_np = np.asarray(jax.device_get(iterations))
+                row = BatchResult(
+                    solver="mpax",
+                    mode="solve",
+                    dtype=dtype.name,
+                    batch_size=batch,
+                    horizon=args.horizon,
+                    n=qp.n,
+                    m=qp.m_original,
+                    n_eq=qp.n_eq,
+                    n_ineq=qp.n_ineq,
+                    nnz_q=qp.nnz_q,
+                    nnz_a_eq=qp.nnz_a_eq,
+                    nnz_g_ineq=qp.nnz_g_ineq,
+                    iteration_limit=args.iteration_limit,
+                    eps_abs=args.eps_abs,
+                    eps_rel=args.eps_rel,
+                    l_inf_ruiz_iterations=args.l_inf_ruiz_iterations,
+                    regularization=args.regularization,
+                    primal_importance=args.primal_importance,
+                    scale_invariant_initial_primal_weight=args.scale_invariant_initial_primal_weight,
+                    elapsed_s=elapsed,
+                    mean_iterations=float(np.mean(iterations_np)),
+                    max_iterations=int(np.max(iterations_np)),
+                    status_values=_status_values(status),
+                    max_abs_x_vs_cpu=max_x,
+                    max_abs_obj_vs_cpu=max_obj,
+                    cpu_throughput=cpu_throughput,
+                )
+                rows.append(row)
+                print(
+                    f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s "
+                    f"iters_mean={row.mean_iterations:.1f} status={row.status_values}"
+                )
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)
@@ -498,6 +515,8 @@ def _worker_cmd(args: argparse.Namespace, dtype: np.dtype, csv_path: pathlib.Pat
         str(args.pock_chambolle_alpha),
         "--regularization",
         str(args.regularization),
+        "--primal-importance", str(args.primal_importance),
+        "--scale-invariant-initial-primal-weight" if args.scale_invariant_initial_primal_weight else "--no-scale-invariant-initial-primal-weight",
         "--eq-tol",
         str(args.eq_tol),
         "--repeat",
@@ -558,13 +577,15 @@ def main() -> None:
     parser.add_argument("--horizon", type=int, default=40)
     parser.add_argument("--batch-sizes", default="512,2048")
     parser.add_argument("--dtypes", default="float32,float64")
-    parser.add_argument("--iteration-limit", type=int, default=25)
-    parser.add_argument("--eps-abs", type=float, default=1e-3)
-    parser.add_argument("--eps-rel", type=float, default=1e-3)
+    parser.add_argument("--iteration-limit", type=int, default=500)
+    parser.add_argument("--eps-abs", type=float, default=1e-4)
+    parser.add_argument("--eps-rel", type=float, default=1e-4)
     parser.add_argument("--termination-evaluation-frequency", type=int, default=100)
     parser.add_argument("--l-inf-ruiz-iterations", type=int, default=10)
     parser.add_argument("--pock-chambolle-alpha", type=float, default=1.0)
     parser.add_argument("--regularization", type=float, default=0.0)
+    parser.add_argument("--primal-importance", type=float, default=0.1)
+    parser.add_argument("--scale-invariant-initial-primal-weight", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--eq-tol", type=float, default=1e-9)
     parser.add_argument("--repeat", type=int, default=3)
     parser.add_argument("--cpu-samples", type=int, default=128)

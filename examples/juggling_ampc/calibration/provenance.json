@@ -1,0 +1,12 @@
+{
+  "source": "bundled calibration",
+  "files": {
+    "REPORT.txt": "e8c7e8512732fd88c8cc1b308a6d7dbfd16577c99f4cee798165b1d51743a96c",
+    "decomposition.json": "23bf3d302a6a914769e17adbf09ca6d8bcf0dab0f374a263cd9a96eb0d166d2b",
+    "empirical_model_v2.json": "2376ed19f4f0fcfa0986d69c98c7cb335e10f22eb9e67efcbd7a84e3772d4dad",
+    "input_manifest.json": "9efd0fa58cb74b1d417a3ce2d8af3702a8de180edfa5d2c6c15c43f05acbdb68",
+    "model.json": "566fe105bda1150b2d9bdb2e46b183ff94e587bd5a797b53d87c54ec5b113f0b",
+    "newton_contact_fit.json": "97a4fe7eb8285f9f5ef54b781ea19bbddda79b34fc6ce1692f724cdaa0c46a52"
+  },
+  "note": "Fit values retained; workstation paths and historical run logs are excluded."
+}

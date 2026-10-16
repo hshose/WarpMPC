@@ -86,6 +86,10 @@ MARKERS = {
 }
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class GradientBatchResult:
     variant: str
@@ -517,40 +521,41 @@ def main() -> None:
             )
             print(f"Variant {variant} dtype={dtype.name}")
             for batch in _parse_ints(args.batch_sizes):
-                estimate = _estimated_bytes(batch, plan, dtype)
-                if estimate > max_bytes:
-                    print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                    break
-                p_values, a_values, q, l, u = batched_problem_data(
-                    problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
-                )
-                try:
-                    value_grad_s, _ = _run_one(
-                        compiled, plan, p_values, a_values, q, l, u, repeat=args.repeat, seed=args.seed + 3000 + batch
+                with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, variant=variant)):
+                    estimate = _estimated_bytes(batch, plan, dtype)
+                    if estimate > max_bytes:
+                        print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                        break
+                    p_values, a_values, q, l, u = batched_problem_data(
+                        problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
                     )
-                except Exception as exc:
-                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                    break
-                row = GradientBatchResult(
-                    variant=variant,
-                    dtype=dtype.name,
-                    batch_size=batch,
-                    horizon=args.horizon,
-                    n=plan.n,
-                    m=plan.m,
-                    kkt_dim=plan.qdldl_plan.n,
-                    kkt_nnz=plan.nnz_kkt,
-                    nnz_l=plan.qdldl_plan.nnz_l,
-                    adjoint_dim=derivative_plan.adjoint_dim,
-                    adjoint_nnz=derivative_plan.adjoint_upper.nnz,
-                    adjoint_nnz_l=derivative_plan.qdldl_plan.nnz_l,
-                    derivative_refinement_iters=args.derivative_refinement_iters,
-                    value_grad_s=value_grad_s,
-                    cpu_throughput=cpu_throughput,
-                    cpu_status_counts=cpu_status_counts,
-                )
-                rows.append(row)
-                print(f"  batch={batch}: value+grad={value_grad_s:.6f}s throughput={row.systems_per_s:.2f}/s")
+                    try:
+                        value_grad_s, _ = _run_one(
+                            compiled, plan, p_values, a_values, q, l, u, repeat=args.repeat, seed=args.seed + 3000 + batch
+                        )
+                    except Exception as exc:
+                        print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                        break
+                    row = GradientBatchResult(
+                        variant=variant,
+                        dtype=dtype.name,
+                        batch_size=batch,
+                        horizon=args.horizon,
+                        n=plan.n,
+                        m=plan.m,
+                        kkt_dim=plan.qdldl_plan.n,
+                        kkt_nnz=plan.nnz_kkt,
+                        nnz_l=plan.qdldl_plan.nnz_l,
+                        adjoint_dim=derivative_plan.adjoint_dim,
+                        adjoint_nnz=derivative_plan.adjoint_upper.nnz,
+                        adjoint_nnz_l=derivative_plan.qdldl_plan.nnz_l,
+                        derivative_refinement_iters=args.derivative_refinement_iters,
+                        value_grad_s=value_grad_s,
+                        cpu_throughput=cpu_throughput,
+                        cpu_status_counts=cpu_status_counts,
+                    )
+                    rows.append(row)
+                    print(f"  batch={batch}: value+grad={value_grad_s:.6f}s throughput={row.systems_per_s:.2f}/s")
 
     horizon_rows: list[GradientHorizonResult] = []
     horizon_variants = {
@@ -592,52 +597,53 @@ def main() -> None:
                     )
                     best_row = None
                     for batch in sorted(_parse_ints(args.horizon_batch_sizes), reverse=True):
-                        estimate = _estimated_bytes(batch, horizon_plan, dtype)
-                        if estimate > max_bytes:
-                            continue
-                        p_values, a_values, q, l, u = batched_problem_data(
-                            horizon_problem,
-                            batch,
-                            dtype,
-                            seed=args.seed + 6000 + horizon + batch,
-                            x0_variation=0.15,
-                        )
-                        try:
-                            value_grad_s, _ = _run_one(
-                                compiled,
-                                horizon_plan,
-                                p_values,
-                                a_values,
-                                q,
-                                l,
-                                u,
-                                repeat=args.repeat,
-                                seed=args.seed + 7000 + horizon + batch,
+                        with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, horizon=horizon, variant=variant)):
+                            estimate = _estimated_bytes(batch, horizon_plan, dtype)
+                            if estimate > max_bytes:
+                                continue
+                            p_values, a_values, q, l, u = batched_problem_data(
+                                horizon_problem,
+                                batch,
+                                dtype,
+                                seed=args.seed + 6000 + horizon + batch,
+                                x0_variation=0.15,
                             )
-                        except Exception as exc:
-                            print(f"  {variant} batch={batch}: failed {type(exc).__name__}: {exc}")
+                            try:
+                                value_grad_s, _ = _run_one(
+                                    compiled,
+                                    horizon_plan,
+                                    p_values,
+                                    a_values,
+                                    q,
+                                    l,
+                                    u,
+                                    repeat=args.repeat,
+                                    seed=args.seed + 7000 + horizon + batch,
+                                )
+                            except Exception as exc:
+                                print(f"  {variant} batch={batch}: failed {type(exc).__name__}: {exc}")
+                                break
+                            best_row = GradientHorizonResult(
+                                variant=variant,
+                                dtype=dtype.name,
+                                horizon=horizon,
+                                batch_size=batch,
+                                n=horizon_plan.n,
+                                m=horizon_plan.m,
+                                kkt_dim=horizon_plan.qdldl_plan.n,
+                                kkt_nnz=horizon_plan.nnz_kkt,
+                                nnz_l=horizon_plan.qdldl_plan.nnz_l,
+                                adjoint_dim=horizon_derivative_plan.adjoint_dim,
+                                adjoint_nnz=horizon_derivative_plan.adjoint_upper.nnz,
+                                adjoint_nnz_l=horizon_derivative_plan.qdldl_plan.nnz_l,
+                                derivative_refinement_iters=args.derivative_refinement_iters,
+                                value_grad_s=value_grad_s,
+                            )
+                            print(
+                                f"  {variant} batch={batch}: value+grad={value_grad_s:.6f}s "
+                                f"throughput={best_row.systems_per_s:.2f}/s"
+                            )
                             break
-                        best_row = GradientHorizonResult(
-                            variant=variant,
-                            dtype=dtype.name,
-                            horizon=horizon,
-                            batch_size=batch,
-                            n=horizon_plan.n,
-                            m=horizon_plan.m,
-                            kkt_dim=horizon_plan.qdldl_plan.n,
-                            kkt_nnz=horizon_plan.nnz_kkt,
-                            nnz_l=horizon_plan.qdldl_plan.nnz_l,
-                            adjoint_dim=horizon_derivative_plan.adjoint_dim,
-                            adjoint_nnz=horizon_derivative_plan.adjoint_upper.nnz,
-                            adjoint_nnz_l=horizon_derivative_plan.qdldl_plan.nnz_l,
-                            derivative_refinement_iters=args.derivative_refinement_iters,
-                            value_grad_s=value_grad_s,
-                        )
-                        print(
-                            f"  {variant} batch={batch}: value+grad={value_grad_s:.6f}s "
-                            f"throughput={best_row.systems_per_s:.2f}/s"
-                        )
-                        break
                     if best_row is not None:
                         horizon_rows.append(best_row)
 

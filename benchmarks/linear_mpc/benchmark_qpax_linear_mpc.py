@@ -32,6 +32,10 @@ from benchmarks.problems import batched_problem_data, make_linear_mpc
 from warpmpc.jax_osqp import OSQPSettings, build_osqp_plan
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class QPAXProblem:
     q_matrix: np.ndarray
@@ -425,49 +429,50 @@ def main() -> None:
         for mode in modes:
             print(f"Benchmark dtype={dtype.name} mode={mode}")
             for batch in _parse_ints(args.batch_sizes):
-                estimate = _estimate_bytes(batch, qp, dtype, mode)
-                if estimate > max_bytes:
-                    print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                    continue
-                _, _, q, l, u = batched_problem_data(
-                    problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
-                )
-                b, h = _qpax_bounds(qp, l, u, dtype)
-                q_jax = jnp.asarray(q)
-                b_jax = jnp.asarray(b)
-                h_jax = jnp.asarray(h)
-                try:
-                    if mode == "solve":
-                        compiled, _ = _compile_and_warm(solve_fn, q_jax, b_jax, h_jax)
-                        elapsed, _ = _time_compiled(compiled, q_jax, b_jax, h_jax, repeat=args.repeat)
-                    else:
-                        rng = np.random.default_rng(args.seed + 1000 + batch)
-                        x_weights = jnp.asarray(rng.standard_normal((batch, qp.n)).astype(dtype))
-                        compiled, _ = _compile_and_warm(grad_fn, q_jax, b_jax, h_jax, x_weights)
-                        elapsed, _ = _time_compiled(compiled, q_jax, b_jax, h_jax, x_weights, repeat=args.repeat)
-                except Exception as exc:
-                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                    continue
-                row = BatchResult(
-                    solver="qpax",
-                    mode=mode,
-                    dtype=dtype.name,
-                    batch_size=batch,
-                    horizon=args.horizon,
-                    n=plan.n,
-                    m=plan.m,
-                    n_eq=qp.n_eq,
-                    n_ineq=qp.n_ineq,
-                    max_iter=args.max_iter,
-                    solver_tol=args.solver_tol,
-                    regularization=args.regularization,
-                    elapsed_s=elapsed,
-                    max_abs_x_vs_cpu=max_x,
-                    max_abs_obj_vs_cpu=max_obj,
-                    cpu_throughput=cpu_throughput,
-                )
-                rows.append(row)
-                print(f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s")
+                with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, mode=mode)):
+                    estimate = _estimate_bytes(batch, qp, dtype, mode)
+                    if estimate > max_bytes:
+                        print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                        continue
+                    _, _, q, l, u = batched_problem_data(
+                        problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
+                    )
+                    b, h = _qpax_bounds(qp, l, u, dtype)
+                    q_jax = jnp.asarray(q)
+                    b_jax = jnp.asarray(b)
+                    h_jax = jnp.asarray(h)
+                    try:
+                        if mode == "solve":
+                            compiled, _ = _compile_and_warm(solve_fn, q_jax, b_jax, h_jax)
+                            elapsed, _ = _time_compiled(compiled, q_jax, b_jax, h_jax, repeat=args.repeat)
+                        else:
+                            rng = np.random.default_rng(args.seed + 1000 + batch)
+                            x_weights = jnp.asarray(rng.standard_normal((batch, qp.n)).astype(dtype))
+                            compiled, _ = _compile_and_warm(grad_fn, q_jax, b_jax, h_jax, x_weights)
+                            elapsed, _ = _time_compiled(compiled, q_jax, b_jax, h_jax, x_weights, repeat=args.repeat)
+                    except Exception as exc:
+                        print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                        continue
+                    row = BatchResult(
+                        solver="qpax",
+                        mode=mode,
+                        dtype=dtype.name,
+                        batch_size=batch,
+                        horizon=args.horizon,
+                        n=plan.n,
+                        m=plan.m,
+                        n_eq=qp.n_eq,
+                        n_ineq=qp.n_ineq,
+                        max_iter=args.max_iter,
+                        solver_tol=args.solver_tol,
+                        regularization=args.regularization,
+                        elapsed_s=elapsed,
+                        max_abs_x_vs_cpu=max_x,
+                        max_abs_obj_vs_cpu=max_obj,
+                        cpu_throughput=cpu_throughput,
+                    )
+                    rows.append(row)
+                    print(f"  batch={batch}: elapsed={elapsed:.6f}s throughput={row.systems_per_s:.2f}/s")
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

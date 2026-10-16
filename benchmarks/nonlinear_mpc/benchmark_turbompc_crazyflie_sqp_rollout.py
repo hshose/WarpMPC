@@ -18,6 +18,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 EVALUATOR = ROOT / "benchmarks" / "nonlinear_mpc" / "evaluate_turbompc_crazyflie_sqp.py"
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import record_vram_case
+
 def _parse_ints(text: str) -> list[int]:
     return [int(part.strip().replace("_", "")) for part in text.split(",") if part.strip()]
 
@@ -110,6 +114,7 @@ def _plot_summary(path: pathlib.Path, rows: list[dict[str, object]]) -> None:
     plt.close(fig)
 
 
+@record_vram_case
 def run_batch(
     args: argparse.Namespace,
     *,

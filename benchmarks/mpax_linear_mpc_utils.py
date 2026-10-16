@@ -3,23 +3,16 @@
 from __future__ import annotations
 
 import dataclasses
-import pathlib
-import sys
 from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 import scipy.sparse as sp
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-MPAX_RESOURCE = ROOT / "resources" / "MPAX"
-if MPAX_RESOURCE.exists() and str(MPAX_RESOURCE) not in sys.path:
-    sys.path.insert(0, str(MPAX_RESOURCE))
-
 import jax
 import jax.numpy as jnp
 from jax.experimental.sparse import BCOO
-from mpax import create_qp, raPDHG
+from warpmpc.jax_osqp.mpax_support import load_mpax
 
 
 @dataclass(frozen=True)
@@ -45,6 +38,7 @@ def make_mpax_linear_mpc_problem(
     *,
     regularization: float = 0.0,
     eq_tol: float = 1e-9,
+    create_qp_fn=None,
 ) -> MPAXLinearMPCProblem:
     """Convert the OSQP-style linear MPC QP to MPAX's sparse QP interface."""
 
@@ -87,6 +81,9 @@ def make_mpax_linear_mpc_problem(
     variable_lower = np.full(problem.q.size, -np.inf, dtype=dtype)
     variable_upper = np.full(problem.q.size, np.inf, dtype=dtype)
 
+    # Diagnostics may explicitly provide the upstream constructor when
+    # comparing source revisions; benchmark calls always use the loader.
+    create_qp = create_qp_fn or load_mpax()[0]
     base_problem = create_qp(
         BCOO.from_scipy_sparse(q_matrix),
         jnp.asarray(objective_vector),
@@ -132,14 +129,17 @@ def mpax_rhs(qp: MPAXLinearMPCProblem, l: np.ndarray, u: np.ndarray, dtype: np.d
 
 def make_solver(
     *,
-    eps_abs: float,
-    eps_rel: float,
-    iteration_limit: int,
-    termination_evaluation_frequency: int,
-    l_inf_ruiz_iterations: int,
-    pock_chambolle_alpha: float,
-    unroll: bool,
-) -> raPDHG:
+    eps_abs: float = 1e-4,
+    eps_rel: float = 1e-4,
+    iteration_limit: int = 500,
+    termination_evaluation_frequency: int = 100,
+    l_inf_ruiz_iterations: int = 10,
+    pock_chambolle_alpha: float = 1.0,
+    unroll: bool = False,
+    primal_importance: float = 0.1,
+    scale_invariant_initial_primal_weight: bool = False,
+) -> Any:
+    _, raPDHG = load_mpax()
     return raPDHG(
         eps_abs=eps_abs,
         eps_rel=eps_rel,
@@ -152,11 +152,13 @@ def make_solver(
         jit=True,
         unroll=unroll,
         warm_start=False,
+        primal_importance=float(primal_importance),
+        scale_invariant_initial_primal_weight=scale_invariant_initial_primal_weight,
         feasibility_polishing=False,
     )
 
 
-def make_batched_solve_fn(qp: MPAXLinearMPCProblem, solver: raPDHG):
+def make_batched_solve_fn(qp: MPAXLinearMPCProblem, solver):
     base_problem = qp.base_problem
 
     def solve_one(objective_vector, right_hand_side):
@@ -176,7 +178,7 @@ def make_batched_solve_fn(qp: MPAXLinearMPCProblem, solver: raPDHG):
     return jax.jit(jax.vmap(solve_one, in_axes=(0, 0)))
 
 
-def make_value_and_grad_fn(qp: MPAXLinearMPCProblem, solver: raPDHG):
+def make_value_and_grad_fn(qp: MPAXLinearMPCProblem, solver):
     base_problem = qp.base_problem
 
     def objective(objective_vectors, right_hand_sides, primal_weights):

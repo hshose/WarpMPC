@@ -1,0 +1,9 @@
+Daily all-trajectory calibration, 2026-10-06
+
+11 released trials, 179 flights, 168 fitted contacts. Every run's final contact and outgoing flight are excluded. No trajectories are held out.
+
+Effective flight model: mixed; gravity [0.1195627938941673, -0.04783837033890285, -9.670166972595966] m/s², linear drag 0.104555 s⁻¹, quadratic drag 0.0554648 m⁻¹. Measured mass stays 3.9 g. These effective coefficients include timing/aerodynamic model bias; hardware defaults are unchanged.
+
+Contact model: edge; restitution 0.55686, edge loss 0.17841, CAD normal rotation [1.0987632758147818, 1.315541366661457, 0.0] degrees. Contact residuals, run/flight acceleration, high-frequency position noise, paired capture/delivery jitter and servo lag form the frozen simulation model.
+
+Validation is distributional: compare simulation against real survival, contact XY/Z, outgoing velocity and apex distributions in real_distribution_targets.json. Different recorded controller settings and sparse edge events limit attribution. No rare-event guarantee is claimed.

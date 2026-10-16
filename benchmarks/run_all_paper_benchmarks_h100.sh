@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+PAPER_DRY_RUN="${PAPER_DRY_RUN:-0}"
+if [[ "${1:-}" == --dry-run ]]; then
+  PAPER_DRY_RUN=1
+  shift
+fi
 if [[ -n "${ROOT:-}" ]]; then
   ROOT="$(cd "${ROOT}" && pwd)"
 elif [[ -n "${SLURM_SUBMIT_DIR:-}" && -d "${SLURM_SUBMIT_DIR}/benchmarks" ]]; then
@@ -14,6 +19,7 @@ else
 fi
 SCRIPT_DIR="${ROOT}/benchmarks"
 ROOT="${ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+export ROOT
 STAMP="$(date +%Y%m%d_%H%M%S)"
 RESULTS_ROOT="${1:-${ROOT}/results/h100_paper_benchmarks_${STAMP}}"
 JOB_IDS_CSV="${RESULTS_ROOT}/job_ids.csv"
@@ -21,12 +27,17 @@ SBATCH_ACCOUNT_ARGS=()
 if [[ -n "${SBATCH_ACCOUNT:-}" ]]; then
   SBATCH_ACCOUNT_ARGS=(--account="${SBATCH_ACCOUNT}")
 fi
+if [[ -n "${SBATCH_PARTITION:-}" ]]; then
+  SBATCH_ACCOUNT_ARGS+=(--partition="${SBATCH_PARTITION}")
+fi
 PAPER_QDLDL_VARIANTS="${PAPER_QDLDL_VARIANTS:-baseline,transpose,segmented,transpose+segmented,transpose+segmented+levelsolve,factor-warp+solve-jax:transpose+segmented,factor-warp+solve-jax:transpose+segmented+levelsolve,factor-warp+solve-warp:transpose,factor-warp+solve-warp:transpose+segmented,factor-warp+solve-warp:transpose+segmented+levelsolve}"
 PAPER_OSQP_VARIANTS="${PAPER_OSQP_VARIANTS:-baseline,transpose+segmented,transpose+segmented+levelsolve,factor-warp+solve-jax:transpose+segmented,factor-warp+solve-jax:transpose+segmented+levelsolve,factor-warp+solve-warp:transpose,factor-warp+solve-warp:transpose+segmented,factor-warp+solve-warp:transpose+segmented+levelsolve}"
 PAPER_NONLINEAR_QDLDL_VARIANTS="${PAPER_NONLINEAR_QDLDL_VARIANTS:-baseline,factor-warp+solve-warp:transpose,factor-warp+solve-warp:transpose+segmented,factor-warp+solve-warp:transpose+segmented+levelsolve}"
 PAPER_QDLDL_BACKEND_PAIRS="${PAPER_QDLDL_BACKEND_PAIRS:-jax:jax,warp:jax,warp:warp}"
 PAPER_LEVELSOLVE_MODES="${PAPER_LEVELSOLVE_MODES:-regular,levelsolve}"
 PAPER_NONLINEAR_BATCH_SIZES="${PAPER_NONLINEAR_BATCH_SIZES:-512,2048,10000,20000,50000,100000,200000,300000}"
+# Humanoid TurboMPC uses WarpMPC's two Ruiz passes and highest float32 ADMM precision.
+TURBOMPC_HUMANOID_SCALING="${TURBOMPC_HUMANOID_SCALING:-2}"
 SWEEP_BATCH_SIZE="${CONSTRAINT_SWEEP_BATCH_SIZE:-200000}"
 SWEEP_CARTPOLE_SQP_ITERATIONS="${CONSTRAINT_SWEEP_CARTPOLE_SQP_ITERATIONS:-5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}"
 SWEEP_CARTPOLE_JAX_OSQP_SQP_ITERATIONS="${CONSTRAINT_SWEEP_CARTPOLE_JAX_OSQP_SQP_ITERATIONS:-5}"
@@ -57,8 +68,27 @@ submit_job() {
   shift 3
   local env_args=("$@")
   local sbatch_id job_id
+  local submission_script="${script}"
+  if [[ "${PAPER_DRY_RUN}" == 1 ]]; then
+    printf 'DRY RUN %s/%s:' "${study}" "${name}"
+    printf ' %q' env "ROOT=${ROOT}" "${env_args[@]}" sbatch "${SBATCH_ACCOUNT_ARGS[@]}" --export=ALL --parsable "${script}" "${RESULTS_ROOT}"
+    printf '\n'
+    printf '%s,%s,dry-run,,%s\n' "${study}" "${name}" "${script}" >> "${JOB_IDS_CSV}"
+    return
+  fi
+  if [[ "${MONITOR_VRAM:-1}" == 1 ]]; then
+    command mkdir -p "${RESULTS_ROOT}/submissions"
+    submission_script="${RESULTS_ROOT}/submissions/${name}.sh"
+    {
+      echo '#!/bin/bash'
+      awk '/^#SBATCH /' "${script}"
+      echo 'set -euo pipefail'
+      echo 'exec "${PYTHON:-${VENV:+${VENV}/bin/}python}" "${ROOT}/benchmarks/monitor_vram.py" --output-dir "${VRAM_RESULTS}/${SLURM_JOB_ID}" --interval "${VRAM_SAMPLE_INTERVAL:-1}" -- bash "${VRAM_SCRIPT}" "${VRAM_RUN_ROOT}"'
+    } > "${submission_script}"
+    env_args+=("VRAM_SCRIPT=${script}" "VRAM_RUN_ROOT=${RESULTS_ROOT}" "VRAM_RESULTS=${RESULTS_ROOT}/vram/${study}/${name}")
+  fi
 
-  if sbatch_id="$(env "ROOT=${ROOT}" "${env_args[@]}" sbatch "${SBATCH_ACCOUNT_ARGS[@]}" --export=ALL --parsable "${script}" "${RESULTS_ROOT}")"; then
+  if sbatch_id="$(env "ROOT=${ROOT}" "${env_args[@]}" sbatch "${SBATCH_ACCOUNT_ARGS[@]}" --export=ALL --parsable "${submission_script}" "${RESULTS_ROOT}")"; then
     job_id="${sbatch_id%%;*}"
     printf '%s,%s,%s,%s,%s\n' \
       "${study}" "${name}" "${job_id}" "${ROOT}/hpclogs/${job_id}.log" "${script}" \
@@ -94,6 +124,7 @@ submit_job "linear_mpc_gradients" "jax_osqp_linear_mpc_gradients" "${ROOT}/bench
 submit_job "linear_mpc_gradients" "boxosqp_linear_mpc_gradients" "${ROOT}/benchmarks/linear_mpc_gradients/run_boxosqp_linear_mpc_gradients.sh"
 submit_job "linear_mpc_gradients" "qpax_linear_mpc_gradients" "${ROOT}/benchmarks/linear_mpc_gradients/run_qpax_linear_mpc_gradients.sh"
 submit_job "linear_mpc_gradients" "mpax_linear_mpc_gradients" "${ROOT}/benchmarks/linear_mpc_gradients/run_mpax_linear_mpc_gradients.sh"
+submit_job "linear_mpc_gradients" "sensitivity_accuracy" "${ROOT}/benchmarks/linear_mpc_gradients/run_sensitivity_accuracy.sh"
 
 submit_job "nonlinear_mpc" "cartpole_quadratic_mpc" "${ROOT}/benchmarks/nonlinear_mpc/run_cartpole_quadratic_mpc.sh" \
   "CARTPOLE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
@@ -139,7 +170,8 @@ submit_job "nonlinear_mpc" "humanoid_mpc_mpx" "${ROOT}/benchmarks/nonlinear_mpc/
   "MPX_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
 submit_job "nonlinear_mpc" "humanoid_mpc_turbompc" "${ROOT}/benchmarks/nonlinear_mpc/run_turbompc_humanoid_mpc.sh" \
   "HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
-  "TURBOMPC_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
+  "TURBOMPC_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
+  "TURBOMPC_HUMANOID_SCALING=${TURBOMPC_HUMANOID_SCALING}"
 submit_job "nonlinear_mpc" "humanoid_mpc_turbompc_autodiff" "${ROOT}/benchmarks/nonlinear_mpc/run_turbompc_autodiff_humanoid_mpc.sh" \
   "HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
   "TURBOMPC_AUTODIFF_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
@@ -174,6 +206,10 @@ submit_job "constraint_sqp_iteration_sweep" "crazyflie_obstacle_rollout_paths" "
   "CONSTRAINT_SWEEP_CRAZYFLIE_OBSTACLE_OSQP_RHO_IS_VEC=${SWEEP_CRAZYFLIE_OBSTACLE_OSQP_RHO_IS_VEC}"
 
 echo
-echo "Submitted H100 paper benchmark jobs."
+if [[ "${PAPER_DRY_RUN}" == 1 ]]; then
+  echo "Dry run complete; no jobs submitted."
+else
+  echo "Submitted H100 paper benchmark jobs."
+fi
 echo "Results: ${RESULTS_ROOT}"
 echo "Job IDs: ${JOB_IDS_CSV}"

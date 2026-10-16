@@ -33,6 +33,10 @@ from warpmpc.jax_qdldl import (
 )
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class GpuResult:
     dtype: str
@@ -287,61 +291,62 @@ def main() -> None:
 
         print("batch, estimated_arrays, factor_s, solve_s, factor+solve_s, systems/s")
         for batch in batches:
-            estimate = _estimate_bytes(batch, plan.n, plan.nnz_a, plan.nnz_l, dtype)
-            if estimate > max_bytes:
-                print(f"{batch}, {_format_gb(estimate)}, skipped_over_limit, -, -, -")
-                break
+            with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype)):
+                estimate = _estimate_bytes(batch, plan.n, plan.nnz_a, plan.nnz_l, dtype)
+                if estimate > max_bytes:
+                    print(f"{batch}, {_format_gb(estimate)}, skipped_over_limit, -, -, -")
+                    break
 
-            values = sample_kkt_values(
-                kkt,
-                batch_size=batch,
-                seed=args.seed + batch,
-                variation=args.variation,
-                dtype=dtype,
-            )
-            rhs = np.random.default_rng(args.seed + 1000 + batch).standard_normal(
-                (batch, plan.n)
-            ).astype(dtype)
-            values_jax = jnp.asarray(values)
-            rhs_jax = jnp.asarray(rhs)
+                values = sample_kkt_values(
+                    kkt,
+                    batch_size=batch,
+                    seed=args.seed + batch,
+                    variation=args.variation,
+                    dtype=dtype,
+                )
+                rhs = np.random.default_rng(args.seed + 1000 + batch).standard_normal(
+                    (batch, plan.n)
+                ).astype(dtype)
+                values_jax = jnp.asarray(values)
+                rhs_jax = jnp.asarray(rhs)
 
-            try:
-                factor_exe, factor_out = _compile_and_warm(compiled.factor, values_jax)
-                lx, _, dinv = factor_out
-                solve_exe, _ = _compile_and_warm(compiled.solve, lx, dinv, rhs_jax)
-                factor_solve_exe, _ = _compile_and_warm(
-                    compiled.factor_and_solve, values_jax, rhs_jax
+                try:
+                    factor_exe, factor_out = _compile_and_warm(compiled.factor, values_jax)
+                    lx, _, dinv = factor_out
+                    solve_exe, _ = _compile_and_warm(compiled.solve, lx, dinv, rhs_jax)
+                    factor_solve_exe, _ = _compile_and_warm(
+                        compiled.factor_and_solve, values_jax, rhs_jax
+                    )
+                    factor_s, factor_out = _time_compiled(
+                        factor_exe, values_jax, repeat=args.repeat
+                    )
+                    lx, _, dinv = factor_out
+                    solve_s, _ = _time_compiled(
+                        solve_exe, lx, dinv, rhs_jax, repeat=args.repeat
+                    )
+                    factor_solve_s, _ = _time_compiled(
+                        factor_solve_exe, values_jax, rhs_jax, repeat=args.repeat
+                    )
+                except Exception as exc:
+                    print(
+                        f"{batch}, {_format_gb(estimate)}, failed, "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                    break
+
+                row = GpuResult(
+                    dtype=dtype.name,
+                    batch_size=batch,
+                    estimated_bytes=estimate,
+                    factor_s=factor_s,
+                    solve_s=solve_s,
+                    factor_solve_s=factor_solve_s,
                 )
-                factor_s, factor_out = _time_compiled(
-                    factor_exe, values_jax, repeat=args.repeat
-                )
-                lx, _, dinv = factor_out
-                solve_s, _ = _time_compiled(
-                    solve_exe, lx, dinv, rhs_jax, repeat=args.repeat
-                )
-                factor_solve_s, _ = _time_compiled(
-                    factor_solve_exe, values_jax, rhs_jax, repeat=args.repeat
-                )
-            except Exception as exc:
+                results.append(row)
                 print(
-                    f"{batch}, {_format_gb(estimate)}, failed, "
-                    f"{type(exc).__name__}: {exc}"
+                    f"{batch}, {_format_gb(estimate)}, {factor_s:.6f}, "
+                    f"{solve_s:.6f}, {factor_solve_s:.6f}, {row.systems_per_s:.2f}"
                 )
-                break
-
-            row = GpuResult(
-                dtype=dtype.name,
-                batch_size=batch,
-                estimated_bytes=estimate,
-                factor_s=factor_s,
-                solve_s=solve_s,
-                factor_solve_s=factor_solve_s,
-            )
-            results.append(row)
-            print(
-                f"{batch}, {_format_gb(estimate)}, {factor_s:.6f}, "
-                f"{solve_s:.6f}, {factor_solve_s:.6f}, {row.systems_per_s:.2f}"
-            )
 
     csv_path = pathlib.Path(args.csv_path)
     plot_path = pathlib.Path(args.plot_path)

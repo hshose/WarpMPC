@@ -22,6 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 benchmarks = [
+    "nvidia-ml-py",
     "cmake",
     "jaxadi",
     "jaxopt",
@@ -38,3 +39,6 @@ test = [
 include = [
     "warpmpc*",
 ]
+
+[tool.setuptools.package-data]
+"warpmpc.jax_osqp" = ["mpax_qp_correctness.patch"]

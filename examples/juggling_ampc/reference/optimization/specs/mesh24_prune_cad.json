@@ -1,0 +1,44 @@
+{
+  "config": {
+    "horizon": 24
+  },
+  "mesh": true,
+  "prefix": 5,
+  "drop": [
+    "workspace",
+    "tilt",
+    "upward",
+    "paddle_velocity",
+    "jerk"
+  ],
+  "dedup": true,
+  "assembly": {
+    "mass_kg": 0.48,
+    "com_m": [
+      0.0528,
+      0.0002,
+      0.0336
+    ],
+    "inertia_com_kg_m2": [
+      [
+        0.000416,
+        -1.67e-05,
+        -0.000162
+      ],
+      [
+        -1.67e-05,
+        0.00288,
+        -9e-07
+      ],
+      [
+        -0.000162,
+        -9e-07,
+        0.003058
+      ]
+    ],
+    "frame": "robot flange (panda_link8), flange-aligned axes; inertia about assembly COM",
+    "assembly": "Adapter, paddle, fasteners and four markers; configure once as end effector, additional load zero",
+    "provenance": "User-provided CAD agent handoff, 2026-09-30. Referenced redesign/02_one_piece_socket/exports/mass_properties.json was not provided locally.",
+    "assumptions": "180 g paddle and solid plastic at 1.27 g/cm^3; estimate, not measured assembly properties"
+  }
+}

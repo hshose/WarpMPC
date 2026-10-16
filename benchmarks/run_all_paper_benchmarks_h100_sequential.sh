@@ -1,6 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+PAPER_DRY_RUN="${PAPER_DRY_RUN:-0}"
+if [[ "${1:-}" == --dry-run ]]; then
+  PAPER_DRY_RUN=1
+  shift
+fi
+
 if [[ -n "${ROOT:-}" ]]; then
   ROOT="$(cd "${ROOT}" && pwd)"
 elif [[ -n "${SLURM_SUBMIT_DIR:-}" && -d "${SLURM_SUBMIT_DIR}/benchmarks" ]]; then
@@ -25,6 +31,7 @@ PAPER_NONLINEAR_QDLDL_VARIANTS="${PAPER_NONLINEAR_QDLDL_VARIANTS:-baseline,facto
 PAPER_QDLDL_BACKEND_PAIRS="${PAPER_QDLDL_BACKEND_PAIRS:-jax:jax,warp:jax,warp:warp}"
 PAPER_LEVELSOLVE_MODES="${PAPER_LEVELSOLVE_MODES:-regular,levelsolve}"
 PAPER_NONLINEAR_BATCH_SIZES="${PAPER_NONLINEAR_BATCH_SIZES:-512,2048,10000,20000,50000,100000,200000,300000}"
+TURBOMPC_HUMANOID_SCALING="${TURBOMPC_HUMANOID_SCALING:-2}"
 SWEEP_BATCH_SIZE="${CONSTRAINT_SWEEP_BATCH_SIZE:-200000}"
 SWEEP_CARTPOLE_SQP_ITERATIONS="${CONSTRAINT_SWEEP_CARTPOLE_SQP_ITERATIONS:-5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}"
 SWEEP_CARTPOLE_JAX_OSQP_SQP_ITERATIONS="${CONSTRAINT_SWEEP_CARTPOLE_JAX_OSQP_SQP_ITERATIONS:-5}"
@@ -58,10 +65,23 @@ run_job() {
   local log_path="${LOG_DIR}/${study}_${name}.log"
   local start_s end_s elapsed_s status
 
+  if [[ "${PAPER_DRY_RUN}" == 1 ]]; then
+    printf 'DRY RUN %s/%s:' "${study}" "${name}"
+    printf ' %q' env "ROOT=${ROOT}" "${env_args[@]}" bash "${script}" "${RESULTS_ROOT}"
+    printf '\n'
+    printf '%s,%s,dry-run,0,,%s\n' "${study}" "${name}" "${script}" >> "${STATUS_CSV}"
+    return
+  fi
   echo "${study}/${name}: running"
   start_s="$(date +%s)"
   set +e
-  env "ROOT=${ROOT}" "${env_args[@]}" bash "${script}" "${RESULTS_ROOT}" > "${log_path}" 2>&1
+  local command=(bash "${script}" "${RESULTS_ROOT}")
+  if [[ "${MONITOR_VRAM:-1}" == 1 ]]; then
+    command=("${PYTHON:-${VENV:+${VENV}/bin/}python}" "${ROOT}/benchmarks/monitor_vram.py"
+      --output-dir "${RESULTS_ROOT}/vram/${study}/${name}/sequential"
+      --interval "${VRAM_SAMPLE_INTERVAL:-1}" -- "${command[@]}")
+  fi
+  env "ROOT=${ROOT}" "${env_args[@]}" "${command[@]}" > "${log_path}" 2>&1
   status="$?"
   set -e
   end_s="$(date +%s)"
@@ -104,6 +124,7 @@ run_job "linear_mpc_gradients" "jax_osqp_linear_mpc_gradients" "${ROOT}/benchmar
 run_job "linear_mpc_gradients" "boxosqp_linear_mpc_gradients" "${ROOT}/benchmarks/linear_mpc_gradients/run_boxosqp_linear_mpc_gradients.sh"
 run_job "linear_mpc_gradients" "qpax_linear_mpc_gradients" "${ROOT}/benchmarks/linear_mpc_gradients/run_qpax_linear_mpc_gradients.sh"
 run_job "linear_mpc_gradients" "mpax_linear_mpc_gradients" "${ROOT}/benchmarks/linear_mpc_gradients/run_mpax_linear_mpc_gradients.sh"
+run_job "linear_mpc_gradients" "sensitivity_accuracy" "${ROOT}/benchmarks/linear_mpc_gradients/run_sensitivity_accuracy.sh"
 
 run_job "nonlinear_mpc" "cartpole_quadratic_mpc" "${ROOT}/benchmarks/nonlinear_mpc/run_cartpole_quadratic_mpc.sh" \
   "CARTPOLE_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
@@ -149,7 +170,8 @@ run_job "nonlinear_mpc" "humanoid_mpc_mpx" "${ROOT}/benchmarks/nonlinear_mpc/run
   "MPX_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
 run_job "nonlinear_mpc" "humanoid_mpc_turbompc" "${ROOT}/benchmarks/nonlinear_mpc/run_turbompc_humanoid_mpc.sh" \
   "HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
-  "TURBOMPC_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
+  "TURBOMPC_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
+  "TURBOMPC_HUMANOID_SCALING=${TURBOMPC_HUMANOID_SCALING}"
 run_job "nonlinear_mpc" "humanoid_mpc_turbompc_autodiff" "${ROOT}/benchmarks/nonlinear_mpc/run_turbompc_autodiff_humanoid_mpc.sh" \
   "HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}" \
   "TURBOMPC_AUTODIFF_HUMANOID_BATCH_SIZES=${PAPER_NONLINEAR_BATCH_SIZES}"
@@ -185,7 +207,11 @@ run_job "constraint_sqp_iteration_sweep" "crazyflie_obstacle_rollout_paths" "${R
 
 echo
 if [[ "${failures}" -eq 0 ]]; then
-  echo "Completed H100 paper benchmark sequential run."
+  if [[ "${PAPER_DRY_RUN}" == 1 ]]; then
+    echo "Dry run complete; no benchmarks executed."
+  else
+    echo "Completed H100 paper benchmark sequential run."
+  fi
   echo "Results: ${RESULTS_ROOT}"
   echo "Status: ${STATUS_CSV}"
   exit 0

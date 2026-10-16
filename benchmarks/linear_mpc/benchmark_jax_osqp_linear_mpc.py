@@ -122,6 +122,10 @@ MARKERS = {
 }
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import vram_case
+
 @dataclass(frozen=True)
 class BatchResult:
     variant: str
@@ -571,48 +575,49 @@ def main() -> None:
                 print(f"  check max_abs_x={max_x:.3e} max_abs_obj={max_obj:.3e}")
 
             for batch in _parse_ints(args.batch_sizes):
-                estimate = _estimated_bytes(batch, plan, dtype)
-                if estimate > max_bytes:
-                    print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
-                    break
-                p_values, a_values, q, l, u = batched_problem_data(
-                    problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
-                )
-                try:
-                    lower_compile_s, compile_s, factor_s, solve_s, linear_solve_loop_s, total_s = _run_one(
-                        compiled, p_values, a_values, q, l, u, repeat=args.repeat
+                with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, variant=variant)):
+                    estimate = _estimated_bytes(batch, plan, dtype)
+                    if estimate > max_bytes:
+                        print(f"  batch={batch}: skipped estimated {estimate / 1024**3:.2f} GiB")
+                        break
+                    p_values, a_values, q, l, u = batched_problem_data(
+                        problem, batch, dtype, seed=args.seed + batch, x0_variation=0.15
                     )
-                except Exception as exc:
-                    print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
-                    break
-                row = BatchResult(
-                    variant=variant,
-                    dtype=dtype.name,
-                    batch_size=batch,
-                    horizon=args.horizon,
-                    n=plan.n,
-                    m=plan.m,
-                    kkt_dim=plan.qdldl_plan.n,
-                    kkt_nnz=plan.nnz_kkt,
-                    nnz_l=plan.qdldl_plan.nnz_l,
-                    linear_solve_count=settings.max_iter,
-                    lower_compile_s=lower_compile_s,
-                    compile_s=compile_s,
-                    factor_s=factor_s,
-                    solve_s=solve_s,
-                    linear_solve_loop_s=linear_solve_loop_s,
-                    factor_solve_s=total_s,
-                    max_abs_x_vs_cpu=max_x,
-                    max_abs_obj_vs_cpu=max_obj,
-                    cpu_throughput=cpu_throughput,
-                )
-                rows.append(row)
-                print(
-                    f"  batch={batch}: compile={compile_s:.3f}s lower_compile={lower_compile_s:.3f}s "
-                    f"factor={factor_s:.6f}s solve={solve_s:.6f}s "
-                    f"linear_solves={linear_solve_loop_s:.6f}s total={total_s:.6f}s "
-                    f"throughput={row.systems_per_s:.2f}/s"
-                )
+                    try:
+                        lower_compile_s, compile_s, factor_s, solve_s, linear_solve_loop_s, total_s = _run_one(
+                            compiled, p_values, a_values, q, l, u, repeat=args.repeat
+                        )
+                    except Exception as exc:
+                        print(f"  batch={batch}: failed {type(exc).__name__}: {exc}")
+                        break
+                    row = BatchResult(
+                        variant=variant,
+                        dtype=dtype.name,
+                        batch_size=batch,
+                        horizon=args.horizon,
+                        n=plan.n,
+                        m=plan.m,
+                        kkt_dim=plan.qdldl_plan.n,
+                        kkt_nnz=plan.nnz_kkt,
+                        nnz_l=plan.qdldl_plan.nnz_l,
+                        linear_solve_count=settings.max_iter,
+                        lower_compile_s=lower_compile_s,
+                        compile_s=compile_s,
+                        factor_s=factor_s,
+                        solve_s=solve_s,
+                        linear_solve_loop_s=linear_solve_loop_s,
+                        factor_solve_s=total_s,
+                        max_abs_x_vs_cpu=max_x,
+                        max_abs_obj_vs_cpu=max_obj,
+                        cpu_throughput=cpu_throughput,
+                    )
+                    rows.append(row)
+                    print(
+                        f"  batch={batch}: compile={compile_s:.3f}s lower_compile={lower_compile_s:.3f}s "
+                        f"factor={factor_s:.6f}s solve={solve_s:.6f}s "
+                        f"linear_solves={linear_solve_loop_s:.6f}s total={total_s:.6f}s "
+                        f"throughput={row.systems_per_s:.2f}/s"
+                    )
 
     horizon_rows: list[HorizonResult] = []
     horizon_variants = {
@@ -640,33 +645,34 @@ def main() -> None:
                     compiled = compile_osqp(horizon_plan, dtype=dtype, **options)
                     best_row = None
                     for batch in sorted(_parse_ints(args.horizon_batch_sizes), reverse=True):
-                        estimate = _estimated_bytes(batch, horizon_plan, dtype)
-                        if estimate > max_bytes:
-                            continue
-                        p_values, a_values, q, l, u = batched_problem_data(
-                            horizon_problem, batch, dtype, seed=args.seed + 2000 + horizon + batch, x0_variation=0.15
-                        )
-                        try:
-                            _, _, _, _, _, total_s = _run_one(
-                                compiled, p_values, a_values, q, l, u, repeat=args.repeat
+                        with vram_case(batch_size=batch, metadata=dict(args=args, dtype=dtype, horizon=horizon, variant=variant)):
+                            estimate = _estimated_bytes(batch, horizon_plan, dtype)
+                            if estimate > max_bytes:
+                                continue
+                            p_values, a_values, q, l, u = batched_problem_data(
+                                horizon_problem, batch, dtype, seed=args.seed + 2000 + horizon + batch, x0_variation=0.15
                             )
-                        except Exception as exc:
-                            print(f"  {variant} batch={batch}: failed {type(exc).__name__}: {exc}")
+                            try:
+                                _, _, _, _, _, total_s = _run_one(
+                                    compiled, p_values, a_values, q, l, u, repeat=args.repeat
+                                )
+                            except Exception as exc:
+                                print(f"  {variant} batch={batch}: failed {type(exc).__name__}: {exc}")
+                                break
+                            best_row = HorizonResult(
+                                variant=variant,
+                                dtype=dtype.name,
+                                horizon=horizon,
+                                batch_size=batch,
+                                n=horizon_plan.n,
+                                m=horizon_plan.m,
+                                kkt_dim=horizon_plan.qdldl_plan.n,
+                                kkt_nnz=horizon_plan.nnz_kkt,
+                                nnz_l=horizon_plan.qdldl_plan.nnz_l,
+                                factor_solve_s=total_s,
+                            )
+                            print(f"  {variant} batch={batch}: total={total_s:.6f}s throughput={best_row.systems_per_s:.2f}/s")
                             break
-                        best_row = HorizonResult(
-                            variant=variant,
-                            dtype=dtype.name,
-                            horizon=horizon,
-                            batch_size=batch,
-                            n=horizon_plan.n,
-                            m=horizon_plan.m,
-                            kkt_dim=horizon_plan.qdldl_plan.n,
-                            kkt_nnz=horizon_plan.nnz_kkt,
-                            nnz_l=horizon_plan.qdldl_plan.nnz_l,
-                            factor_solve_s=total_s,
-                        )
-                        print(f"  {variant} batch={batch}: total={total_s:.6f}s throughput={best_row.systems_per_s:.2f}/s")
-                        break
                     if best_row is not None:
                         horizon_rows.append(best_row)
 

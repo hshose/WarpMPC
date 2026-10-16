@@ -20,6 +20,10 @@ if str(ROOT) not in sys.path:
 EVALUATOR = ROOT / "benchmarks" / "nonlinear_mpc" / "evaluate_turbompc_humanoid_mpc.py"
 
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from benchmarks.vram_cases import record_vram_case
+
 def _parse_ints(text: str) -> list[int]:
     return [int(part.strip().replace("_", "")) for part in text.split(",") if part.strip()]
 
@@ -45,6 +49,10 @@ FIELDNAMES = [
     "turbompc_eps_rel",
     "rho",
     "sigma",
+    "scaling",
+    "turbompc_matmul_precision",
+    "finite_qp_fraction",
+    "qp_residual_definition",
     "alpha",
     "total_rti_steps",
     "elapsed_s",
@@ -109,6 +117,7 @@ def _plot_summary(path: pathlib.Path, rows: list[dict[str, object]]) -> None:
     plt.close(fig)
 
 
+@record_vram_case
 def run_batch(args: argparse.Namespace, *, batch_size: int, dtype: str) -> dict[str, object]:
     prefix = f"humanoid_mpc_turbompc_{dtype}_batch_{batch_size}"
     plot_path = args.output_dir / f"{prefix}.png"
@@ -153,6 +162,8 @@ def run_batch(args: argparse.Namespace, *, batch_size: int, dtype: str) -> dict[
         str(args.rho),
         "--sigma",
         str(args.sigma),
+        "--scaling",
+        str(args.scaling),
         "--alpha",
         str(args.alpha),
         "--line-search-step-min",
@@ -207,11 +218,13 @@ def run_batch(args: argparse.Namespace, *, batch_size: int, dtype: str) -> dict[
     if proc.returncode == 0 and summary_json.exists():
         summary = json.loads(summary_json.read_text())
         row.update(summary)
-        row["status"] = "ok"
-        row["error"] = ""
+        finite = summary["finite_qp_fraction"] == 1.0
+        row["status"] = "ok" if finite else "failed"
+        row["error"] = "" if finite else "Nonfinite QP residuals in the feedback rollout"
         print(
             f"solver=turbompc dtype={dtype} batch={batch_size}: "
-            f"{float(summary['rti_steps_per_s']):.3g} SQP-RTI steps/s"
+            + (f"{float(summary['rti_steps_per_s']):.3g} SQP-RTI steps/s"
+               if finite else f"nonfinite QP residuals, see {log_path}")
         )
     else:
         row["status"] = "failed"
@@ -223,7 +236,6 @@ def run_batch(args: argparse.Namespace, *, batch_size: int, dtype: str) -> dict[
 def main() -> None:
     from benchmarks.problems.humanoid_mpc import (
         HUMANOID_MODEL_NAME,
-        HUMANOID_MPC_STANDING_REFERENCE_S,
         HUMANOID_PARAMETERS_PATH,
         HUMANOID_PHI_VEL,
         load_humanoid_mpc_parameters,
@@ -235,7 +247,7 @@ def main() -> None:
     parser.add_argument("--horizon-nodes", type=int, default=None)
     parser.add_argument("--sim-steps", type=int, default=20)
     parser.add_argument("--control-dt", type=float, default=0.01)
-    parser.add_argument("--standing-reference-s", type=float, default=HUMANOID_MPC_STANDING_REFERENCE_S)
+    parser.add_argument("--standing-reference-s", type=float, default=0.0)
     parser.add_argument("--phi-vel", type=float, default=HUMANOID_PHI_VEL)
     parser.add_argument("--model-name", default=HUMANOID_MODEL_NAME)
     parser.add_argument("--parameters", type=pathlib.Path, default=HUMANOID_PARAMETERS_PATH)
@@ -248,6 +260,7 @@ def main() -> None:
     parser.add_argument("--turbompc-eps-rel", type=float, default=1e-3)
     parser.add_argument("--rho", type=float, default=None)
     parser.add_argument("--sigma", type=float, default=1e-6)
+    parser.add_argument("--scaling", type=int, default=None)
     parser.add_argument("--alpha", type=float, default=None)
     parser.add_argument("--line-search-step-min", type=float, default=None)
     parser.add_argument("--turbompc-forward-backend", default="admm_fused_cudss")
@@ -267,6 +280,8 @@ def main() -> None:
         args.rho = loaded_params.osqp_rho
     if args.alpha is None:
         args.alpha = loaded_params.osqp_alpha
+    if args.scaling is None:
+        args.scaling = loaded_params.osqp_scaling
     if args.line_search_step_min is None:
         args.line_search_step_min = loaded_params.line_search_step_min
     args.output_dir.mkdir(parents=True, exist_ok=True)

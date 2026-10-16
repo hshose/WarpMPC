@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import pathlib
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import jax
@@ -23,6 +23,7 @@ if TURBOMPC_ROOT.exists() and str(TURBOMPC_ROOT) not in sys.path:
 from turbompc.problems.optimal_control_problem import OptimalControlProblem
 from turbompc.solvers.turbompc_solver import TurboMPCSolver
 from turbompc.utils.load_params import load_solver_params
+from turbompc.solvers.admm.admm import _compute_residuals
 
 
 _INFTY = 1.0e30
@@ -637,3 +638,123 @@ def initial_admm_state_batch(
         )
 
     return jax.vmap(init_one)(states, controls, packed_params)
+
+
+@dataclass(frozen=True)
+class DenseStageQPScaling:
+    """WarpMPC's fixed Ruiz scaling mapped to TurboMPC's padded blocks.
+
+    With x = D x_hat, the scaled cost is c f(D x_hat) and the
+    constraints are E A D x_hat in [E l, E u]. Padding has unit scale.
+    The ADMM wrapper keeps the SQP iterate and warm state in original units.
+    """
+
+    cost: float
+    variables: np.ndarray
+    initial: np.ndarray
+    dynamics: np.ndarray
+    local: np.ndarray
+
+    @classmethod
+    def from_sparse_plan(cls, problem: DenseStageTurbompcProblem, plan):
+        scaling = plan.osqp_plan
+        nodes = problem.horizon + 1
+        d = np.ones((nodes, problem._block_dim))
+        ed = np.ones((nodes - 1, problem._nx))
+        eg = np.ones((nodes, problem._num_ineq))
+        for i, width in enumerate(problem._stage_var_dims):
+            start = int(problem._z_offsets[i])
+            d[i, problem._block_index[i]] = scaling.scaling_d[start : start + width]
+            offset = int(plan.constraint_offsets[i])
+            rows = problem._dynamic_rows[i]
+            if i < nodes - 1:
+                ed[i, :len(rows)] = scaling.scaling_e[offset + rows]
+            rows = problem._local_rows[i]
+            eg[i, :len(rows)] = scaling.scaling_e[offset + rows]
+        e0 = scaling.scaling_e[problem._a0_rows]
+        return cls(scaling.scaling_c, d, e0, ed, eg)
+
+    def _arrays(self, dtype):
+        return tuple(jnp.asarray(v, dtype=dtype) for v in (
+            self.cost, self.variables, self.initial, self.dynamics, self.local
+        ))
+
+    def scale_qp(self, qp):
+        c, d, e0, ed, eg = self._arrays(qp.cost.q.dtype)
+        return replace(
+            qp,
+            cost=replace(
+                qp.cost,
+                D=c * d[:, :, None] * qp.cost.D * d[:, None, :],
+                E=c * d[1:, :, None] * qp.cost.E * d[:-1, None, :],
+                q=c * d * qp.cost.q,
+            ),
+            eq=replace(
+                qp.eq,
+                A0=e0[:, None] * qp.eq.A0 * d[0],
+                A_minus=ed[:, :, None] * qp.eq.A_minus * d[:-1, None, :],
+                A_plus=ed[:, :, None] * qp.eq.A_plus * d[1:, None, :],
+                c0=e0 * qp.eq.c0,
+                c=ed * qp.eq.c,
+            ),
+            ineq=replace(
+                qp.ineq,
+                G=eg[:, :, None] * qp.ineq.G * d[:, None, :],
+                l=eg * qp.ineq.l,
+                u=eg * qp.ineq.u,
+            ),
+        )
+
+    def transform_state(self, state, *, inverse=False):
+        c, d, e0, ed, eg = self._arrays(state.x_blocks.dtype)
+        factors = dict(x_blocks=1 / d, y_f_0=c / e0, y_f_dyn=c / ed,
+                       y_g=c / eg, z_g=eg, xi_g=eg)
+        return state._replace(**{
+            name: getattr(state, name) / factor if inverse else getattr(state, name) * factor
+            for name, factor in factors.items()
+        })
+
+
+class ScaledTurbompcADMM:
+    """Solve an equivalent scaled QP with the upstream TurboMPC backend.
+
+    Iterates enter and leave in original units. Inner ADMM statistics retain
+    solver units; use ``qp_residuals`` for original-unit residuals.
+    """
+
+    def __init__(self, solver, scaling: DenseStageQPScaling):
+        self.solver = solver
+        self.scaling = scaling
+
+    def __getattr__(self, name):
+        return getattr(self.solver, name)
+
+    def solve(self, qp_data, admm_state0=None, **kwargs):
+        if qp_data.ineq.use_slack_variables:
+            raise ValueError("Fixed QP scaling currently supports hard constraints only")
+        if admm_state0 is None:
+            admm_state0 = self.solver.initial_state(qp_data, rho_bar=kwargs.get("rho_bar", 1.0))
+        # TurboMPC forms normal equations with dense C.T @ C and G.T @ G.
+        # Reduced-precision GPU matmuls can perturb those products enough to
+        # leave a large stationarity error even after Ruiz scaling. Keep the
+        # arithmetic in the requested dtype, with full float32 products.
+        with jax.default_matmul_precision("highest"):
+            _, stats, scaled_state = self.solver.solve(
+                qp_data=self.scaling.scale_qp(qp_data),
+                admm_state0=self.scaling.transform_state(admm_state0),
+                **kwargs,
+            )
+        state = self.scaling.transform_state(scaled_state, inverse=True)
+        nx = self.scaling.initial.size
+        return (state.x_blocks[:, :nx], state.x_blocks[:, nx:]), stats, state
+
+
+def qp_residuals(qp_data, state):
+    """Actual QP split-primal and stationarity residuals in original units.
+
+    Use the linearization that ADMM solved and its returned iterate, before
+    nonlinear line search. SQP constraint violation/step size are not these
+    residuals, and fused TurboMPC does not populate per-iteration ADMM stats.
+    """
+    residuals = _compute_residuals(qp_data, state)
+    return residuals.primal_residual, residuals.dual_residual

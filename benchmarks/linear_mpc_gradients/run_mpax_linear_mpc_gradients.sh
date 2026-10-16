@@ -3,7 +3,6 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=24
 #SBATCH --time=12:00:00
-#SBATCH --partition=c23g
 #SBATCH --job-name=mpaxgrad
 #SBATCH --output=hpclogs/%A.log
 #SBATCH --error=hpclogs/%A.log
@@ -28,6 +27,7 @@ run_benchmark "mpax_linear_mpc_gradients" \
     --batch-sizes "${BATCH_SIZES}" \
     --dtypes "${DTYPES}" \
     --iteration-limit "${MAX_ITER}" \
+    --primal-importance "${MPAX_PRIMAL_IMPORTANCE:-0.1}" \
     --eps-abs "${EPS_ABS}" \
     --eps-rel "${EPS_REL}" \
     --repeat "${REPEAT}" \

@@ -3,7 +3,6 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=24
 #SBATCH --time=12:00:00
-#SBATCH --partition=c23g
 #SBATCH --job-name=turbohuman
 #SBATCH --output=hpclogs/%A.log
 #SBATCH --error=hpclogs/%A.log
@@ -28,6 +27,8 @@ TURBOMPC_BACKWARD_BACKEND="${TURBOMPC_BACKWARD_BACKEND:-direct_cudss_ffi}"
 TURBOMPC_EPS_ABS="${TURBOMPC_EPS_ABS:-${EPS_ABS}}"
 TURBOMPC_EPS_REL="${TURBOMPC_EPS_REL:-${EPS_REL}}"
 TURBOMPC_HUMANOID_BATCH_SIZES="${TURBOMPC_HUMANOID_BATCH_SIZES:-${HUMANOID_BATCH_SIZES}}"
+# Positive scaling also enables highest float32 precision inside the ADMM solve.
+TURBOMPC_HUMANOID_SCALING="${TURBOMPC_HUMANOID_SCALING:-2}"
 
 run_benchmark "${HUMANOID_OUTPUT_NAME}" \
   "${PYTHON}" benchmarks/nonlinear_mpc/benchmark_turbompc_humanoid_mpc.py \
@@ -35,6 +36,7 @@ run_benchmark "${HUMANOID_OUTPUT_NAME}" \
     --dtypes "${DTYPES}" \
     --sim-steps 20 \
     --max-iter "${MAX_ITER}" \
+    --scaling "${TURBOMPC_HUMANOID_SCALING}" \
     --turbompc-eps-abs "${TURBOMPC_EPS_ABS}" \
     --turbompc-eps-rel "${TURBOMPC_EPS_REL}" \
     --sigma 1e-6 \

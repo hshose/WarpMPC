@@ -4,7 +4,6 @@
 #SBATCH --cpus-per-task=48
 #SBATCH --mem-per-cpu=8G
 #SBATCH --time=12:00:00
-#SBATCH --partition=c23g
 #SBATCH --job-name=cudss
 #SBATCH --output=hpclogs/%A.log
 #SBATCH --error=hpclogs/%A.log

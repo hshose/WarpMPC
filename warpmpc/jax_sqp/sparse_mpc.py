@@ -47,16 +47,27 @@ def _require_x64_for_float64(dtype: np.dtype) -> None:
 
 @dataclass(frozen=True)
 class MPAXSettings:
-    """Settings for the MPAX sparse QP backend used by sparse MPC SQP."""
+    """Settings for the MPAX sparse QP backend used by sparse MPC SQP.
 
-    eps_abs: float = 1e-3
-    eps_rel: float = 1e-3
-    iteration_limit: int = 25
+    ``warm_start`` reuses the supplied QP primal/dual state independently of
+    the outer SQP trajectory. Set ``warm_start_primal=False`` to reuse only
+    duals, starting the new SQP increment at zero. Disable scale-invariant initial weighting to
+    use ``primal_importance`` directly as the initial PDHG primal weight.
+    """
+
+    eps_abs: float = 1e-4
+    eps_rel: float = 1e-4
+    iteration_limit: int = 500
     termination_evaluation_frequency: int = 100
     l_inf_ruiz_iterations: int = 10
     pock_chambolle_alpha: float = 1.0
     regularization: float = 0.0
     unroll: bool = False
+    warm_start: bool = True
+    warm_start_primal: bool = True
+    warm_start_primal_scale: float = 1.0
+    primal_importance: float = 0.1
+    scale_invariant_initial_primal_weight: bool = False
 
 
 @dataclass(frozen=True)
@@ -212,14 +223,9 @@ def _csc_pattern(
 
 
 def _load_mpax():
-    try:
-        from mpax import create_qp, raPDHG
-    except ImportError as exc:
-        raise ImportError(
-            "qp_solver='mpax' requires MPAX. Install MPAX separately; "
-            "WarpMPC does not install benchmark-only solvers by default."
-        ) from exc
-    return create_qp, raPDHG
+    from warpmpc.jax_osqp.mpax_support import load_mpax
+
+    return load_mpax()
 
 
 def _mpax_bound_rows(
@@ -371,7 +377,9 @@ def _compile_mpax_qp(
         debug=False,
         jit=True,
         unroll=settings.unroll,
-        warm_start=False,
+        warm_start=settings.warm_start,
+        primal_importance=float(settings.primal_importance),
+        scale_invariant_initial_primal_weight=settings.scale_invariant_initial_primal_weight,
         feasibility_polishing=False,
     )
 
@@ -382,7 +390,7 @@ def _compile_mpax_qp(
             y=jnp.zeros((batch_size, m), dtype=jdtype),
         )
 
-    def _solve_one(p_values, a_values, q, lower_qp, upper_qp):
+    def _solve_one(p_values, a_values, q, lower_qp, upper_qp, state_x, state_y):
         p_full_data = p_values[p_full_value_map_jax]
         if settings.regularization:
             p_full_data = p_full_data + jnp.where(
@@ -428,7 +436,21 @@ def _compile_mpax_qp(
             constraint_matrix_t=constraint_matrix.T,
             right_hand_side=right_hand_side,
         )
-        result = solver.optimize(problem)
+        # MPAX uses q + Qx - A.T y = 0 and nonnegative inequality duals.
+        # The shared OSQP state uses q + Qx + A.T y = 0 instead.
+        initial_dual = jnp.concatenate(
+            [
+                -state_y[equality_rows_jax],
+                jnp.maximum(-state_y[lower_rows_jax], 0.0),
+                jnp.maximum(state_y[upper_rows_jax], 0.0),
+            ]
+        )
+        result = solver.optimize(
+            problem,
+            initial_primal_solution=(state_x * settings.warm_start_primal_scale
+                if settings.warm_start_primal else jnp.zeros_like(state_x)),
+            initial_dual_solution=initial_dual,
+        )
         primal_solution = jnp.asarray(result.primal_solution, dtype=jdtype)
         dual_solution = jnp.asarray(result.dual_solution, dtype=jdtype)
         original_a = BCOO((a_values, a_indices), shape=(m, n))
@@ -450,7 +472,7 @@ def _compile_mpax_qp(
             jnp.asarray(result.primal_objective, dtype=jdtype),
         )
 
-    solve_batch = jax.jit(jax.vmap(_solve_one, in_axes=(0, 0, 0, 0, 0)))
+    solve_batch = jax.jit(jax.vmap(_solve_one, in_axes=(0, 0, 0, 0, 0, 0, 0)))
 
     def solve_warm_start(
         p_values,
@@ -462,8 +484,8 @@ def _compile_mpax_qp(
         state_z,
         state_y,
     ):
-        del state_x, state_z, state_y
-        return solve_batch(p_values, a_values, q, lower_qp, upper_qp)
+        del state_z
+        return solve_batch(p_values, a_values, q, lower_qp, upper_qp, state_x, state_y)
 
     return _CompiledMPAXQP(
         settings=settings,

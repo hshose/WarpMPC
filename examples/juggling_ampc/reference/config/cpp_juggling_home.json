@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "x_base_m": 0.65,
+  "description": "Rounded X near the measured ball drop (0.653 m); retain model nominal Y and strike height."
+}

@@ -14,6 +14,39 @@ from warpmpc.jax_osqp import OSQPSettings, build_osqp_plan, compile_osqp
 
 
 class JaxOSQPScalingTest(unittest.TestCase):
+    def test_free_row_penalty_preserves_solution_and_improves_conditioning(self):
+        p = sp.eye(2, format="csc")
+        a = sp.csc_matrix([[1., 1.], [1., 0.], [2., -3.]])
+        lower = np.array([1., 0., -np.inf])
+        upper = np.array([1., np.inf, np.inf])
+        q = np.zeros(2)
+        plans = []
+        for rho_free in (None, 1e-6):
+            settings = OSQPSettings(rho_is_vec=True, rho_free=rho_free, max_iter=500)
+            plan = build_osqp_plan(p, a, lower, upper, settings, scaling_q=q)
+            plans.append(plan)
+            solver = compile_osqp(plan, dtype=np.float64)
+            result = solver.solve(*[jnp.asarray(v[None, :]) for v in
+                                    (plan.p_upper.data, plan.a_matrix.data, q, lower, upper)])
+            np.testing.assert_allclose(np.asarray(result[0])[0], [.5, .5], atol=1e-7)
+        np.testing.assert_allclose(plans[0].rho_vec, [100., .1, .1])
+        np.testing.assert_allclose(plans[1].rho_vec, [100., .1, 1e-6])
+        def condition(plan):
+            k = plan.kkt_upper.toarray()
+            return np.linalg.cond(k + k.T - np.diag(np.diag(k)))
+        self.assertLess(condition(plans[0]), condition(plans[1]) / 100)
+
+    def test_free_row_penalty_validation_and_scalar_rho(self):
+        p = sp.eye(1, format="csc")
+        a = sp.eye(1, format="csc")
+        for value in (0., -1., np.inf, np.nan):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "rho_free"):
+                build_osqp_plan(p, a, [-np.inf], [np.inf], OSQPSettings(rho_free=value))
+        for vector, expected in ((True, .02), (False, .1)):
+            plan = build_osqp_plan(p, a, [-np.inf], [np.inf],
+                                   OSQPSettings(rho_is_vec=vector, rho_free=.02))
+            np.testing.assert_allclose(plan.rho_vec, [expected])
+
     def test_vector_rho_matches_osqp_fixed_iterations(self):
         try:
             import osqp
@@ -40,6 +73,7 @@ class JaxOSQPScalingTest(unittest.TestCase):
             scaling=0,
             adaptive_rho=False,
             rho_is_vec=True,
+            rho_free=1e-6,
             check_termination=0,
             warm_starting=False,
             polishing=False,

@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "errors": {
+    "initial": 6.417089082333405e-14,
+    "H": 6.821210263296962e-13,
+    "A": 5.861977570020827e-14,
+    "gradient": 4.576200529626817e-15,
+    "constraints": 1.3322676295501878e-15,
+    "cost": 1.3877787807814457e-17,
+    "plan": 6.968026156073392e-11,
+    "dual": 3.2141941885832637e-11
+  },
+  "variables": 714,
+  "constraints": 1472,
+  "hessian_nnz": 11016,
+  "constraint_plus_bound_nnz": 31566,
+  "spec": {
+    "config": {
+      "horizon": 20
+    },
+    "mesh": true
+  }
+}
