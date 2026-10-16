@@ -45,7 +45,7 @@ python -m pip install -e .
 ```
 
 The default install contains the core library and minimal-example dependencies.
-The juggling example has separate `requirements.txt` files in their example
+GMR and juggling have separate `requirements.txt` files in their example
 directories; use a dedicated environment for each example. For the benchmarks,
 see [the benchmark guide](benchmarks/README.md).
 
@@ -85,6 +85,8 @@ Larger examples for desktop or server GPUs include:
 - [Quadrotor AMPC synthesis](examples/crazyflie_ampc/).
 - [Franka juggling AMPC](examples/juggling_ampc/): full-dynamics MPC data
   collection, neural-policy training, Eigen export, and policy evaluation.
+- [GMR AMASS motion retargeting](examples/gmr_retargeting/): batched motion
+  retargeting to the Unitree G1 with accuracy and H100 throughput comparisons.
 - [Cartpole cost function tuning](examples/cartpole_tuning/).
 - [Humanoid whole-body MPC](examples/humanoid/).
 

@@ -1,0 +1,8 @@
+# Install alongside a CUDA-enabled JAX and the WarpMPC installation.
+# Reference versions used in the real-AMASS H100 study.
+mujoco==3.14.0
+mink==1.3.0
+daqp==0.10.1
+warp-lang>=1.17
+rich
+matplotlib
