@@ -110,7 +110,7 @@ def benchmark_callable(
     *,
     batch_size: int,
     repeats: int,
-) -> dict[str, float]:
+) -> dict[str, Any]:
     compile_inputs = random_inputs_with_key(
         casadi_function,
         batch_size,
@@ -141,6 +141,9 @@ def benchmark_callable(
         high=0.1,
     )
 
+    # Input generation dispatches asynchronously. Exclude that work from the
+    # first evaluation sample, just as compilation and warmup are excluded.
+    block_until_ready(run_inputs)
     timings = []
     for _ in range(repeats):
         start = time.perf_counter()
@@ -150,6 +153,8 @@ def benchmark_callable(
     return {
         "jax_compile_seconds": compile_seconds,
         "execution_mean_seconds": float(np.mean(timings)),
+        "execution_median_seconds": float(np.median(timings)),
+        "execution_samples_seconds": timings,
         "execution_min_seconds": float(np.min(timings)),
         "execution_max_seconds": float(np.max(timings)),
         "compile_input_seed": COMPILE_INPUT_SEED,

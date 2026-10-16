@@ -1,0 +1,8 @@
+{
+  "source_results": "results/crazyflie_ampc_reference",
+  "source_branch": "publication-cleanup",
+  "source_commit": "65aa6199d64d3821fdfd99cb0d5d736e7b75002d",
+  "bounds_sha256": "91c1bc8bf6ea00dfe4b2c31a82daf88a99e0b55dda92aa254ba29bc21314d454",
+  "paper_config_sha256": "1ea6d810b71bcac8a3621b7e9fb1e9ee3d70413496f1d1d43591b79ac1b9cb29",
+  "note": "Bounds and cost threshold are fixed calibration results from the paper. Normalization and all training data are recomputed."
+}

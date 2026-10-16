@@ -46,6 +46,21 @@ def _assert_matches(testcase, casadi_function, inputs, atol=1e-9, rtol=1e-9):
 
 
 class ConverterTests(unittest.TestCase):
+    def test_warp_conditional_literal_zero(self):
+        # CasADi emits integer `0` for an if_else branch. Warp requires both
+        # wp.where branches to have the same type, even for floating outputs.
+        if not any(device.platform == "gpu" for device in jax.devices()):
+            self.skipTest("Warp JAX FFI requires a GPU")
+        try:
+            import warp  # noqa: F401
+        except ImportError:
+            self.skipTest("warp-lang is not installed")
+        x = cs.SX.sym("x")
+        f = cs.Function("conditional_literal_zero", [x], [cs.if_else(x > 0, x, 0)])
+        compiled = jax.jit(jax.vmap(convert(f, backend="warp")))
+        values = np.array([[-2.], [0.], [3.]], dtype=np.float32)
+        np.testing.assert_array_equal(np.asarray(compiled(values)).ravel(), [0., 0., 3.])
+
     def test_all_common_scalar_sx_operations(self):
         x = cs.SX.sym("x", 3, 2)
         y = cs.SX.sym("y", 3, 2)

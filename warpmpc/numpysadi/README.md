@@ -24,6 +24,14 @@ result = compiled(jnp.ones((2, 3)), jnp.ones((3, 2)))
 export(casadi_fn, "generated_matmul_plus.py")
 ```
 
+## Warp code generation
+
+`convert(function, backend="warp")` generates a float32 Warp kernel with a JAX
+frontend. `export` accepts the same backend; `generate_warp_source` exposes the
+source generator. This path requires Warp 1.17 or newer; the GMR and juggling
+example requirements select a compatible version. The JAX backend
+remains the default.
+
 ## Scope
 
 The library currently supports:

@@ -89,6 +89,8 @@ Larger examples for desktop or server GPUs include:
   retargeting to the Unitree G1 with accuracy and H100 throughput comparisons.
 - [Cartpole cost function tuning](examples/cartpole_tuning/).
 - [Humanoid whole-body MPC](examples/humanoid/).
+- [AMPC speedrun](examples/crazyflie_ampc/README_speedrun.md): one-pass quadrotor data synthesis
+  and training with persistent compilation caches.
 
 ## Examples and Benchmarks from the Paper
 
@@ -102,6 +104,7 @@ export VENV=/path/to/venv
 
 # Big H100 examples, native execution
 bash examples/crazyflie_ampc/run_h100_ampc_one_iteration.sh
+bash examples/crazyflie_ampc/run_h100_ampc_speedrun.sh # Most stripped down version
 bash examples/cartpole_tuning/run_h100_cartpole_physical_quadratic_tuning.sh
 
 # Franka juggling AMPC, prepare a portable H100 submission

@@ -83,8 +83,8 @@ if wp is not None:
                     offset = process_offsets[k, r]
                     val = y[cidx, batch]
 
-                    for col_pos in range(max_col):
-                        if col_pos < offset and col_mask[cidx, col_pos] != 0:
+                    for col_pos in range(wp.min(offset, max_col)):
+                        if col_mask[cidx, col_pos] != 0:
                             row = col_rows[cidx, col_pos]
                             lidx = col_lidx[cidx, col_pos]
                             y[row, batch] += -lx[lidx, batch] * val
@@ -155,8 +155,8 @@ if wp is not None:
                         offset = process_offsets[k, r]
                         val = y[cidx, batch]
 
-                        for col_pos in range(max_col):
-                            if col_pos < offset and col_mask[cidx, col_pos] != 0:
+                        for col_pos in range(wp.min(offset, max_col)):
+                            if col_mask[cidx, col_pos] != 0:
                                 row = col_rows[cidx, col_pos]
                                 lidx = col_lidx[cidx, col_pos]
                                 y[row, batch] += -lx[lidx, batch] * val
@@ -350,6 +350,7 @@ if wp is not None:
         col_rows: wp.array2d(dtype=wp.int32),
         col_lidx: wp.array2d(dtype=wp.int32),
         col_mask: wp.array2d(dtype=wp.int32),
+        col_ends: wp.array(dtype=wp.int32),
         level_cols_flat: wp.array(dtype=wp.int32),
         level_start: int,
         work: wp.array2d[Any],
@@ -358,7 +359,7 @@ if wp is not None:
         col = level_cols_flat[level_start + level_pos]
         val = work[col, batch]
         max_col = col_rows.shape[1]
-        for pos in range(max_col):
+        for pos in range(col_ends[col]):
             if col_mask[col, pos] != 0:
                 row = col_rows[col, pos]
                 lidx = col_lidx[col, pos]
@@ -371,6 +372,7 @@ if wp is not None:
         col_rows: wp.array2d(dtype=wp.int32),
         col_lidx: wp.array2d(dtype=wp.int32),
         col_mask: wp.array2d(dtype=wp.int32),
+        col_ends: wp.array(dtype=wp.int32),
         level_cols_flat: wp.array(dtype=wp.int32),
         level_start: int,
         work: wp.array2d[Any],
@@ -379,7 +381,7 @@ if wp is not None:
         col = level_cols_flat[level_start + level_pos]
         max_col = col_rows.shape[1]
         correction = work.dtype(0.0)
-        for pos in range(max_col):
+        for pos in range(col_ends[col]):
             if col_mask[col, pos] != 0:
                 row = col_rows[col, pos]
                 lidx = col_lidx[col, pos]
@@ -393,6 +395,7 @@ if wp is not None:
         col_rows: wp.array2d(dtype=wp.int32),
         col_lidx: wp.array2d(dtype=wp.int32),
         col_mask: wp.array2d(dtype=wp.int32),
+        col_ends: wp.array(dtype=wp.int32),
         level_cols_flat: wp.array(dtype=wp.int32),
         level_offsets: wp.array(dtype=wp.int32),
         start_level: int,
@@ -407,7 +410,7 @@ if wp is not None:
             for flat_pos in range(start, stop):
                 col = level_cols_flat[flat_pos]
                 val = work[col, batch]
-                for pos in range(max_col):
+                for pos in range(col_ends[col]):
                     if col_mask[col, pos] != 0:
                         row = col_rows[col, pos]
                         lidx = col_lidx[col, pos]
@@ -420,6 +423,7 @@ if wp is not None:
         col_rows: wp.array2d(dtype=wp.int32),
         col_lidx: wp.array2d(dtype=wp.int32),
         col_mask: wp.array2d(dtype=wp.int32),
+        col_ends: wp.array(dtype=wp.int32),
         level_cols_flat: wp.array(dtype=wp.int32),
         level_offsets: wp.array(dtype=wp.int32),
         start_level: int,
@@ -436,7 +440,7 @@ if wp is not None:
                 flat_pos = stop - 1 - flat_offset
                 col = level_cols_flat[flat_pos]
                 correction = work.dtype(0.0)
-                for pos in range(max_col):
+                for pos in range(col_ends[col]):
                     if col_mask[col, pos] != 0:
                         row = col_rows[col, pos]
                         lidx = col_lidx[col, pos]
@@ -557,19 +561,19 @@ if wp is not None:
             )
             wp.overload(
                 _qdldl_lsolve_level_ragged_transpose_kernel,
-                [real2d, int2d, int2d, int2d, int1d, int, real2d],
+                [real2d, int2d, int2d, int2d, int1d, int1d, int, real2d],
             )
             wp.overload(
                 _qdldl_ltsolve_level_ragged_transpose_kernel,
-                [real2d, int2d, int2d, int2d, int1d, int, real2d],
+                [real2d, int2d, int2d, int2d, int1d, int1d, int, real2d],
             )
             wp.overload(
                 _qdldl_lsolve_serial_levels_transpose_kernel,
-                [real2d, int2d, int2d, int2d, int1d, int1d, int, int, real2d],
+                [real2d, int2d, int2d, int2d, int1d, int1d, int1d, int, int, real2d],
             )
             wp.overload(
                 _qdldl_ltsolve_serial_levels_transpose_kernel,
-                [real2d, int2d, int2d, int2d, int1d, int1d, int, int, real2d],
+                [real2d, int2d, int2d, int2d, int1d, int1d, int1d, int, int, real2d],
             )
             wp.overload(
                 _qdldl_unpermute_solution_transpose_kernel,
@@ -982,6 +986,7 @@ if wp is not None:
             col_rows: wp.array2d(dtype=wp.int32),
             col_lidx: wp.array2d(dtype=wp.int32),
             col_mask: wp.array2d(dtype=wp.int32),
+            col_ends: wp.array(dtype=wp.int32),
             level_cols_flat: wp.array(dtype=wp.int32),
             level_offsets: wp.array(dtype=wp.int32),
             out: real2d,
@@ -1006,6 +1011,7 @@ if wp is not None:
                             col_rows,
                             col_lidx,
                             col_mask,
+                            col_ends,
                             level_cols_flat,
                             flat_start,
                             work,
@@ -1020,6 +1026,7 @@ if wp is not None:
                             col_rows,
                             col_lidx,
                             col_mask,
+                            col_ends,
                             level_cols_flat,
                             level_offsets,
                             start_level,
@@ -1042,6 +1049,7 @@ if wp is not None:
                             col_rows,
                             col_lidx,
                             col_mask,
+                            col_ends,
                             level_cols_flat,
                             flat_start,
                             work,
@@ -1056,6 +1064,7 @@ if wp is not None:
                             col_rows,
                             col_lidx,
                             col_mask,
+                            col_ends,
                             level_cols_flat,
                             level_offsets,
                             start_level,
@@ -1251,6 +1260,12 @@ def compile_qdldl_warp(
     )
     level_cols_flat = jnp.asarray(level_cols_flat_np, dtype=jnp.int32)
     level_offsets = jnp.asarray(level_offsets_np, dtype=jnp.int32)
+    # Keep mask support, including holes, but do not traverse padded tails.
+    col_ends_np = np.max(
+        np.where(np.asarray(plan.col_mask, dtype=bool), np.arange(plan.col_mask.shape[1])[None, :] + 1, 0),
+        axis=1, initial=0,
+    )
+    col_ends = jnp.asarray(col_ends_np, dtype=jnp.int32)
     if level_scheduled_solve:
         solve_level_callback = _make_qdldl_solve_ragged_serial_transpose_callable(
             level_schedule,
@@ -1368,6 +1383,7 @@ def compile_qdldl_warp(
                 col_rows,
                 col_lidx,
                 col_mask,
+                col_ends,
                 level_cols_flat,
                 level_offsets,
                 output_dims=output_dims,

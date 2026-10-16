@@ -105,3 +105,10 @@ Extra example dependencies beyond the base project are listed in
 
 For motion-capture hardware scripts, supply your server explicitly with
 `--mocap-host <server-hostname-or-address>`.
+
+For the most stripped down data-synthesis and training version, see the
+[speedrun guide](README_speedrun.md):
+
+```bash
+bash examples/crazyflie_ampc/run_h100_ampc_speedrun.sh
+```

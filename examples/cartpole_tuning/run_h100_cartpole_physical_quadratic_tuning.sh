@@ -47,7 +47,7 @@ cd "${ROOT}" || exit 1
 
 export XLA_PYTHON_CLIENT_PREALLOCATE=true
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.92
-export JAX_COMPILATION_CACHE_DIR="${ROOT}/.jax_cache"
+export WARPMPC_CACHE_DIR="${WARPMPC_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/warpmpc}"
 
 echo "Cartpole physical-parameter pure-quadratic MPC TuRBO tuning H100 run"
 echo "Host: $(uname -n)"
